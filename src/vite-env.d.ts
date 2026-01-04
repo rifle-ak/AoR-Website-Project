@@ -19,6 +19,10 @@ interface ImportMetaEnv {
   readonly VITE_SERVER_IP: string
   readonly VITE_SERVER_PORT: string
   readonly VITE_SERVER_MAX_PLAYERS: string
+  readonly VITE_CURRENT_PLAYERS: string
+  readonly VITE_CURRENT_QUEUE: string
+  readonly VITE_SERVER_FPS: string
+  readonly VITE_SERVER_UPTIME: string
   readonly VITE_NEXT_WIPE_DATE: string
   readonly VITE_NEXT_WIPE_TYPE: string
   readonly VITE_LAST_WIPE_DATE: string
