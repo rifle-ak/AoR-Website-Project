@@ -22,37 +22,45 @@ const ServerStatus = () => {
   const nextWipeDate = import.meta.env.VITE_NEXT_WIPE_DATE || '2026-01-08T19:00:00Z'
   const lastWipeDate = import.meta.env.VITE_LAST_WIPE_DATE || '2026-01-01T19:00:00Z'
 
+  // Optional manual stats (for when no API is available)
+  const currentPlayers = parseInt(import.meta.env.VITE_CURRENT_PLAYERS || '0')
+  const currentQueue = parseInt(import.meta.env.VITE_CURRENT_QUEUE || '0')
+  const serverFps = parseInt(import.meta.env.VITE_SERVER_FPS || '60')
+  const serverUptime = import.meta.env.VITE_SERVER_UPTIME || '0d 0h 0m'
+
   const [serverInfo, setServerInfo] = useState<ServerInfo>({
     name: serverName,
-    players: 0,
+    players: currentPlayers,
     maxPlayers: maxPlayers,
-    queue: 0,
+    queue: currentQueue,
     map: 'Procedural Map',
-    fps: 60,
+    fps: serverFps,
     lastWipe: lastWipeDate.split('T')[0],
     nextWipe: nextWipeDate,
-    uptime: '0d 0h 0m'
+    uptime: serverUptime
   })
-  const [isOnline, setIsOnline] = useState(false)
+  const [isOnline, setIsOnline] = useState(currentPlayers > 0)
 
   useEffect(() => {
     // TODO: Replace with actual API call to your Rust server
     // This could use Rust+ API, Battlemetrics API, or custom backend
     const fetchServerStatus = async () => {
       try {
-        // Example: const response = await fetch('/api/server/status')
-        // const data = await response.json()
-        // setServerInfo(data)
-        // setIsOnline(true)
+        const useRealAPI = import.meta.env.VITE_ENABLE_REAL_SERVER_STATUS === 'true'
 
-        // Mock data for demo
-        setServerInfo(prev => ({
-          ...prev,
-          players: Math.floor(Math.random() * 150) + 50,
-          queue: Math.floor(Math.random() * 10),
-          fps: Math.floor(Math.random() * 10) + 55
-        }))
-        setIsOnline(true)
+        if (useRealAPI) {
+          // TODO: Make actual API call when backend is ready
+          // const response = await fetch(import.meta.env.VITE_API_URL + '/server/status')
+          // const data = await response.json()
+          // setServerInfo(data)
+          // setIsOnline(true)
+          console.warn('VITE_ENABLE_REAL_SERVER_STATUS is true but no API configured yet')
+          setIsOnline(false)
+          return
+        }
+
+        // Demo mode - use manually configured stats from .env
+        setIsOnline(currentPlayers > 0)
       } catch (error) {
         console.error('Failed to fetch server status:', error)
         setIsOnline(false)
