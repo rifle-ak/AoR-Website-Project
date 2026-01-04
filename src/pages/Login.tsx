@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react'
 
 const Login = () => {

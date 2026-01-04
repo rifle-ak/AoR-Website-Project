@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Search, Copy, Check, Terminal } from 'lucide-react'
 
 const Commands = () => {

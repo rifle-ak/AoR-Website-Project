@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { X, Download, Calendar, User } from 'lucide-react'
 
 interface GalleryItem {
