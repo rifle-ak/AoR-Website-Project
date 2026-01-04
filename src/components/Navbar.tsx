@@ -17,6 +17,7 @@ const Navbar = () => {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Leaderboards', href: '/leaderboards' },
+    { name: 'Wipe Schedule', href: '/wipe-schedule' },
     { name: 'Commands', href: '/commands' },
     { name: 'Gallery', href: '/gallery' },
   ]
