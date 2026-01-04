@@ -1,20 +1,31 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Users, Copy, Check, Server, Shield, Zap } from 'lucide-react'
+import { copyToClipboard as copyToClipboardUtil } from '../utils/clipboard'
 
 const Home = () => {
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState(false)
   const [serverStatus, setServerStatus] = useState({
     online: 19,
     max: 100,
     status: 'online'
   })
 
-  const serverConnectCommand = "client.connect 188.64.33.62:28017"
+  const serverAddress = import.meta.env.VITE_SERVER_ADDRESS || "188.64.33.62:28017"
+  const serverConnectCommand = `client.connect ${serverAddress}`
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(serverConnectCommand)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const handleCopyToClipboard = async () => {
+    const success = await copyToClipboardUtil(serverConnectCommand)
+
+    if (success) {
+      setCopied(true)
+      setCopyError(false)
+      setTimeout(() => setCopied(false), 2000)
+    } else {
+      setCopyError(true)
+      setTimeout(() => setCopyError(false), 3000)
+    }
   }
 
   useEffect(() => {
@@ -87,11 +98,12 @@ const Home = () => {
                 <div className="flex items-center justify-between">
                   <code className="text-rust-400 text-sm">{serverConnectCommand}</code>
                   <button
-                    onClick={copyToClipboard}
+                    onClick={handleCopyToClipboard}
                     className="flex items-center space-x-1 text-rust-500 hover:text-rust-400 transition-colors"
+                    aria-label="Copy server connect command"
                   >
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    <span className="text-sm">{copied ? 'Copied!' : 'Copy'}</span>
+                    <span className="text-sm">{copied ? 'Copied!' : copyError ? 'Failed' : 'Copy'}</span>
                   </button>
                 </div>
               </div>
@@ -133,25 +145,25 @@ const Home = () => {
             </h2>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="https://discord.gg/artofrust"
+                href={import.meta.env.VITE_DISCORD_INVITE || "https://discord.gg/artofrust"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary"
               >
                 Join Discord
               </a>
-              <a
-                href="/gallery"
+              <Link
+                to="/gallery"
                 className="btn-secondary"
               >
                 View Gallery
-              </a>
-              <a
-                href="/commands"
+              </Link>
+              <Link
+                to="/commands"
                 className="btn-secondary"
               >
                 Server Commands
-              </a>
+              </Link>
             </div>
           </div>
         </div>

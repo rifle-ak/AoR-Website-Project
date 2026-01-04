@@ -1,14 +1,23 @@
 import { useState } from 'react'
-import { Search, Copy, Check, Terminal } from 'lucide-react'
+import { Search, Copy, Check, Terminal, AlertCircle } from 'lucide-react'
+import { copyToClipboard as copyToClipboardUtil } from '../utils/clipboard'
 
 const Commands = () => {
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
+  const [copyError, setCopyError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const copyToClipboard = (command: string) => {
-    navigator.clipboard.writeText(command)
-    setCopiedCommand(command)
-    setTimeout(() => setCopiedCommand(null), 2000)
+  const handleCopyToClipboard = async (command: string) => {
+    const success = await copyToClipboardUtil(command)
+
+    if (success) {
+      setCopiedCommand(command)
+      setCopyError(null)
+      setTimeout(() => setCopiedCommand(null), 2000)
+    } else {
+      setCopyError(command)
+      setTimeout(() => setCopyError(null), 3000)
+    }
   }
 
   const rustCommands = [
@@ -111,12 +120,15 @@ const Commands = () => {
                         <p className="text-dark-300 text-sm mt-1">{cmd.description}</p>
                       </div>
                       <button
-                        onClick={() => copyToClipboard(cmd.command)}
+                        onClick={() => handleCopyToClipboard(cmd.command)}
                         className="ml-3 flex items-center space-x-1 text-rust-500 hover:text-rust-400 transition-colors flex-shrink-0"
                         title="Copy command"
+                        aria-label={`Copy ${cmd.command}`}
                       >
                         {copiedCommand === cmd.command ? (
-                          <Check className="w-4 h-4" />
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : copyError === cmd.command ? (
+                          <AlertCircle className="w-4 h-4 text-red-500" />
                         ) : (
                           <Copy className="w-4 h-4" />
                         )}
