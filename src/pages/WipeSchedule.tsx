@@ -13,7 +13,7 @@ interface WipeEvent {
 }
 
 const WipeSchedule = () => {
-  const [nextWipe, setNextWipe] = useState<WipeEvent>({
+  const [nextWipe, _setNextWipe] = useState<WipeEvent>({
     id: '1',
     type: 'full',
     date: '2026-01-08T19:00:00Z',
@@ -22,7 +22,7 @@ const WipeSchedule = () => {
     notes: 'Monthly force wipe - Full wipe including blueprints'
   })
 
-  const [upcomingWipes, setUpcomingWipes] = useState<WipeEvent[]>([
+  const [upcomingWipes, _setUpcomingWipes] = useState<WipeEvent[]>([
     {
       id: '2',
       type: 'map',
@@ -41,7 +41,7 @@ const WipeSchedule = () => {
     }
   ])
 
-  const [wipeHistory, setWipeHistory] = useState<WipeEvent[]>([
+  const [wipeHistory, _setWipeHistory] = useState<WipeEvent[]>([
     {
       id: 'h1',
       type: 'full',
