@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Twitter, Youtube, Instagram } from 'lucide-react'
+import ThemeSwitcher from './ThemeSwitcher'
 
 // Discord icon component (lucide-react doesn't include Discord)
 const Discord = ({ className }: { className?: string }) => (
@@ -68,6 +69,7 @@ const Navbar = () => {
                 <social.icon className="w-5 h-5" />
               </a>
             ))}
+            <ThemeSwitcher />
             <Link
               to="/login"
               className="btn-primary text-sm"
@@ -117,6 +119,9 @@ const Navbar = () => {
                   <social.icon className="w-5 h-5" />
                 </a>
               ))}
+            </div>
+            <div className="px-3 py-2">
+              <ThemeSwitcher />
             </div>
             <Link
               to="/login"

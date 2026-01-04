@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { X, Download, Calendar, User } from 'lucide-react'
+import SEO from '../components/SEO'
 
 interface GalleryItem {
   id: number
@@ -78,7 +79,13 @@ const Gallery = () => {
     : galleryItems.filter(item => item.category === selectedCategory)
 
   return (
-    <div className="min-h-screen py-12">
+    <>
+      <SEO
+        title="Community Gallery"
+        description="Amazing screenshots and moments captured by the Art of Rust community. Browse bases, raids, events, and epic Rust gameplay moments."
+        keywords="rust gallery, rust screenshots, rust bases, rust raids, rust events, gaming gallery"
+      />
+      <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">Community Gallery</h1>
@@ -209,6 +216,7 @@ const Gallery = () => {
         </div>
       )}
     </div>
+    </>
   )
 }
 

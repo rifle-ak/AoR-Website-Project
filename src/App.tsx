@@ -1,11 +1,16 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
+import LoadingSpinner from './components/LoadingSpinner'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import Home from './pages/Home'
-import Commands from './pages/Commands'
-import Gallery from './pages/Gallery'
-import Login from './pages/Login'
+
+// Lazy load pages for code splitting
+const Home = lazy(() => import('./pages/Home'))
+const Commands = lazy(() => import('./pages/Commands'))
+const Gallery = lazy(() => import('./pages/Gallery'))
+const Login = lazy(() => import('./pages/Login'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
   return (
@@ -13,12 +18,15 @@ function App() {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/commands" element={<Commands />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/commands" element={<Commands />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>

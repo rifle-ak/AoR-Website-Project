@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertTriangle } from 'lucide-react'
+import { logError } from '../services/monitoring'
 
 interface Props {
   children: ReactNode
@@ -22,10 +23,13 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo)
-
-    // TODO: Log to error tracking service (Sentry, LogRocket, etc.)
-    // Example: logErrorToService(error, errorInfo)
+    // Log to monitoring service (Sentry-ready)
+    logError(error, {
+      errorInfo,
+      componentStack: errorInfo.componentStack,
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+    })
   }
 
   handleReset = () => {

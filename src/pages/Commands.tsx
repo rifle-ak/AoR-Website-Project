@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search, Copy, Check, Terminal, AlertCircle } from 'lucide-react'
 import { copyToClipboard as copyToClipboardUtil } from '../utils/clipboard'
+import SEO from '../components/SEO'
 
 const Commands = () => {
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
@@ -82,7 +83,13 @@ const Commands = () => {
   })).filter(category => category.commands.length > 0)
 
   return (
-    <div className="min-h-screen py-12">
+    <>
+      <SEO
+        title="Server Commands"
+        description="Complete list of Rust server commands available on Art of Rust servers. Find commands for teleportation, economy, clan system, and admin features."
+        keywords="rust commands, server commands, rust admin commands, rust economy, rust teleportation, clan commands"
+      />
+      <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">Rust Server Commands</h1>
@@ -158,6 +165,7 @@ const Commands = () => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

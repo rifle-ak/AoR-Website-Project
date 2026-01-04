@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Users, Copy, Check, Server, Shield, Zap } from 'lucide-react'
 import { copyToClipboard as copyToClipboardUtil } from '../utils/clipboard'
+import SEO from '../components/SEO'
 
 const Home = () => {
   const [copied, setCopied] = useState(false)
@@ -58,7 +59,9 @@ const Home = () => {
   ]
 
   return (
-    <div className="space-y-16">
+    <>
+      <SEO />
+      <div className="space-y-16">
       <section className="relative bg-gradient-to-br from-dark-800 to-dark-900 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -169,6 +172,7 @@ const Home = () => {
         </div>
       </section>
     </div>
+    </>
   )
 }
 

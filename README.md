@@ -96,12 +96,19 @@ src/
 
 ### Current Features
 
+- **Customizable Themes** - 5 built-in themes with localStorage persistence
+  - Rust (default) - Official game-inspired theme
+  - Dark - Clean modern dark theme
+  - Light - Bright and accessible
+  - Forest - Nature-inspired green
+  - Ocean - Deep blue ocean theme
 - Responsive navigation with mobile menu
 - Server status display (currently mock data)
 - Commands list with search and copy functionality
 - Community gallery with category filtering
-- Login/signup interface (UI only, no backend)
-- Dark theme optimized for gaming
+- Login/signup interface with comprehensive validation
+- Error boundaries for graceful error handling
+- Clipboard utilities with fallback support
 
 ### Planned Features
 
@@ -112,6 +119,114 @@ src/
 - Analytics integration
 - Performance optimizations
 - SEO enhancements
+- Custom theme creator
+
+## Theming System
+
+The application includes a powerful theming system with multiple pre-built themes and full customization support.
+
+### Available Themes
+
+1. **Rust** (Default) - Post-apocalyptic theme inspired by the game
+   - Orange/rust primary colors
+   - Dark, gritty atmosphere
+   - Perfect for the gaming aesthetic
+
+2. **Dark** - Clean modern dark theme
+   - Sky blue accents
+   - True black backgrounds
+   - Minimal and sleek
+
+3. **Light** - Bright and accessible
+   - High contrast for readability
+   - Professional appearance
+   - Great for daytime use
+
+4. **Forest** - Nature-inspired green theme
+   - Earthy green tones
+   - Calming atmosphere
+   - Unique alternative style
+
+5. **Ocean** - Deep blue ocean theme
+   - Cyan/teal accents
+   - Underwater vibes
+   - Cool and refreshing
+
+### Using Themes
+
+**In the UI:**
+- Click the theme picker button in the navigation bar (palette icon)
+- Select your preferred theme from the dropdown
+- Theme preference is automatically saved to localStorage
+
+**In Code:**
+
+```tsx
+import { useTheme } from './contexts/ThemeContext'
+
+function MyComponent() {
+  const { theme, themeId, setTheme, availableThemes } = useTheme()
+
+  // Access current theme
+  console.log(theme.name) // "Rust"
+
+  // Change theme
+  setTheme('dark')
+
+  // Access theme colors
+  const primaryColor = theme.colors.primary[500]
+}
+```
+
+### Creating Custom Themes
+
+Add new themes in `src/config/themes.ts`:
+
+```typescript
+export const myCustomTheme: Theme = {
+  id: 'custom',
+  name: 'Custom Theme',
+  description: 'My custom theme',
+  colors: {
+    primary: { /* ... */ },
+    background: { /* ... */ },
+    surface: { /* ... */ },
+    text: { /* ... */ },
+    status: { /* ... */ },
+  },
+  effects: {
+    shadow: '0 4px 6px rgba(0,0,0,0.3)',
+    borderRadius: '0.5rem',
+    glowColor: 'rgba(255,0,0,0.2)', // Optional
+  }
+}
+
+// Add to themes object
+export const themes = {
+  // ...existing themes
+  custom: myCustomTheme,
+}
+```
+
+### Theme CSS Variables
+
+Themes automatically apply CSS variables that can be used in Tailwind classes:
+
+- `primary-{50-900}` - Primary brand colors
+- `bg-main`, `bg-secondary`, `bg-tertiary` - Background colors
+- `surface-main`, `surface-secondary`, `surface-hover`, `surface-border` - Surface/card colors
+- `text-primary`, `text-secondary`, `text-tertiary`, `text-disabled` - Text colors
+- `success`, `warning`, `error`, `info` - Status colors
+
+**Example usage:**
+
+```tsx
+<div className="bg-surface-main border border-surface-border">
+  <h1 className="text-text-primary">Title</h1>
+  <p className="text-text-secondary">Description</p>
+  <button className="bg-primary-500 text-white">Click me</button>
+</div>
+```
 
 ## Configuration
 
