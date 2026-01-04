@@ -13,6 +13,7 @@ interface FormErrors {
   email?: string
   password?: string
   confirmPassword?: string
+  [key: string]: string | undefined
 }
 
 const Login = () => {
