@@ -14,9 +14,11 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
 
+  const leaderboardsEnabled = import.meta.env.VITE_ENABLE_LEADERBOARDS === 'true'
+
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Leaderboards', href: '/leaderboards' },
+    ...(leaderboardsEnabled ? [{ name: 'Leaderboards', href: '/leaderboards' }] : []),
     { name: 'Wipe Schedule', href: '/wipe-schedule' },
     { name: 'Commands', href: '/commands' },
     { name: 'Gallery', href: '/gallery' },
