@@ -13,8 +13,16 @@ interface ImportMetaEnv {
   readonly VITE_CONTACT_EMAIL: string
   readonly VITE_ENABLE_AUTH: string
   readonly VITE_ENABLE_DISCORD_BOT: string
+  readonly VITE_ENABLE_LEADERBOARDS: string
   readonly VITE_ENABLE_REAL_SERVER_STATUS: string
   readonly VITE_ENABLE_ANALYTICS: string
+  readonly VITE_SERVER_IP: string
+  readonly VITE_SERVER_PORT: string
+  readonly VITE_SERVER_MAX_PLAYERS: string
+  readonly VITE_NEXT_WIPE_DATE: string
+  readonly VITE_NEXT_WIPE_TYPE: string
+  readonly VITE_LAST_WIPE_DATE: string
+  readonly VITE_MAP_SIZE: string
   readonly VITE_GA_TRACKING_ID: string
   readonly VITE_SENTRY_DSN: string
   readonly VITE_SENTRY_ENVIRONMENT: string

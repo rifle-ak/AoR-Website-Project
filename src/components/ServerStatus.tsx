@@ -14,15 +14,23 @@ interface ServerInfo {
 }
 
 const ServerStatus = () => {
+  // Get configuration from environment variables
+  const serverName = import.meta.env.VITE_SERVER_NAME || 'Art of Rust | Main Server'
+  const serverIp = import.meta.env.VITE_SERVER_IP || '188.64.33.62'
+  const serverPort = import.meta.env.VITE_SERVER_PORT || '28017'
+  const maxPlayers = parseInt(import.meta.env.VITE_SERVER_MAX_PLAYERS || '200')
+  const nextWipeDate = import.meta.env.VITE_NEXT_WIPE_DATE || '2026-01-08T19:00:00Z'
+  const lastWipeDate = import.meta.env.VITE_LAST_WIPE_DATE || '2026-01-01T19:00:00Z'
+
   const [serverInfo, setServerInfo] = useState<ServerInfo>({
-    name: 'Art of Rust | Main Server',
+    name: serverName,
     players: 0,
-    maxPlayers: 200,
+    maxPlayers: maxPlayers,
     queue: 0,
     map: 'Procedural Map',
     fps: 60,
-    lastWipe: '2026-01-01',
-    nextWipe: '2026-01-08',
+    lastWipe: lastWipeDate.split('T')[0],
+    nextWipe: nextWipeDate,
     uptime: '0d 0h 0m'
   })
   const [isOnline, setIsOnline] = useState(false)
@@ -167,7 +175,7 @@ const ServerStatus = () => {
           <button
             onClick={() => {
               // Copy to clipboard
-              navigator.clipboard.writeText('connect artofrust.art:28015')
+              navigator.clipboard.writeText(`connect ${serverIp}:${serverPort}`)
             }}
             className="btn-primary w-full"
           >
@@ -176,7 +184,7 @@ const ServerStatus = () => {
           <button
             onClick={() => {
               // Open Steam connect URL
-              window.open('steam://connect/artofrust.art:28015', '_blank')
+              window.open(`steam://connect/${serverIp}:${serverPort}`, '_blank')
             }}
             className="btn-secondary w-full"
           >

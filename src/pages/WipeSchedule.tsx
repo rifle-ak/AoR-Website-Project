@@ -13,13 +13,21 @@ interface WipeEvent {
 }
 
 const WipeSchedule = () => {
+  // Get configuration from environment variables
+  const nextWipeDate = import.meta.env.VITE_NEXT_WIPE_DATE || '2026-01-08T19:00:00Z'
+  const nextWipeType = (import.meta.env.VITE_NEXT_WIPE_TYPE || 'full') as WipeEvent['type']
+  const lastWipeDate = import.meta.env.VITE_LAST_WIPE_DATE || '2026-01-01T19:00:00Z'
+  const mapSize = parseInt(import.meta.env.VITE_MAP_SIZE || '4000')
+
   const [nextWipe, _setNextWipe] = useState<WipeEvent>({
     id: '1',
-    type: 'full',
-    date: '2026-01-08T19:00:00Z',
+    type: nextWipeType,
+    date: nextWipeDate,
     completed: false,
-    mapSize: 4000,
-    notes: 'Monthly force wipe - Full wipe including blueprints'
+    mapSize: mapSize,
+    notes: nextWipeType === 'full'
+      ? 'Monthly force wipe - Full wipe including blueprints'
+      : 'Map wipe only - Blueprints preserved'
   })
 
   const [upcomingWipes, _setUpcomingWipes] = useState<WipeEvent[]>([
@@ -45,20 +53,11 @@ const WipeSchedule = () => {
     {
       id: 'h1',
       type: 'full',
-      date: '2026-01-01T19:00:00Z',
+      date: lastWipeDate,
       completed: true,
-      mapSize: 4000,
+      mapSize: mapSize,
       mapSeed: '12345678',
-      notes: 'New Year force wipe'
-    },
-    {
-      id: 'h2',
-      type: 'map',
-      date: '2025-12-25T19:00:00Z',
-      completed: true,
-      mapSize: 4000,
-      mapSeed: '87654321',
-      notes: 'Christmas map wipe'
+      notes: 'Last server wipe'
     }
   ])
 
