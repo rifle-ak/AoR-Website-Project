@@ -28,7 +28,7 @@ const ServerStatus = () => {
   const serverFps = parseInt(import.meta.env.VITE_SERVER_FPS || '60')
   const serverUptime = import.meta.env.VITE_SERVER_UPTIME || '0d 0h 0m'
 
-  const [serverInfo, setServerInfo] = useState<ServerInfo>({
+  const [serverInfo, _setServerInfo] = useState<ServerInfo>({
     name: serverName,
     players: currentPlayers,
     maxPlayers: maxPlayers,
