@@ -24,7 +24,7 @@ const Footer = () => {
               <li><Link to="/" className="text-dark-400 hover:text-rust-500 transition-colors">Home</Link></li>
               <li><Link to="/commands" className="text-dark-400 hover:text-rust-500 transition-colors">Server Commands</Link></li>
               <li><Link to="/gallery" className="text-dark-400 hover:text-rust-500 transition-colors">Gallery</Link></li>
-              <li><a href="https://upgrade.chat/artofrust" target="_blank" rel="noopener noreferrer" className="text-dark-400 hover:text-rust-500 transition-colors flex items-center space-x-1">
+              <li><a href={import.meta.env.VITE_DONATE_URL || "https://www.paypal.com/donate/?hosted_button_id=3XT3JB75XG84W"} target="_blank" rel="noopener noreferrer" className="text-dark-400 hover:text-rust-500 transition-colors flex items-center space-x-1">
                 <span>Donate</span>
                 <ExternalLink className="w-3 h-3" />
               </a></li>

@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_DONATE_URL: string
   readonly VITE_CONTACT_EMAIL: string
   readonly VITE_ENABLE_AUTH: string
+  readonly VITE_ENABLE_DISCORD_BOT: string
   readonly VITE_ENABLE_REAL_SERVER_STATUS: string
   readonly VITE_ENABLE_ANALYTICS: string
   readonly VITE_GA_TRACKING_ID: string
