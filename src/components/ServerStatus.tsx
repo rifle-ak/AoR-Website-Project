@@ -1,0 +1,191 @@
+import { useEffect, useState } from 'react'
+import { Users, Clock, Server, Zap, Map, Calendar } from 'lucide-react'
+
+interface ServerInfo {
+  name: string
+  players: number
+  maxPlayers: number
+  queue: number
+  map: string
+  fps: number
+  lastWipe: string
+  nextWipe: string
+  uptime: string
+}
+
+const ServerStatus = () => {
+  const [serverInfo, setServerInfo] = useState<ServerInfo>({
+    name: 'Art of Rust | Main Server',
+    players: 0,
+    maxPlayers: 200,
+    queue: 0,
+    map: 'Procedural Map',
+    fps: 60,
+    lastWipe: '2026-01-01',
+    nextWipe: '2026-01-08',
+    uptime: '0d 0h 0m'
+  })
+  const [isOnline, setIsOnline] = useState(false)
+
+  useEffect(() => {
+    // TODO: Replace with actual API call to your Rust server
+    // This could use Rust+ API, Battlemetrics API, or custom backend
+    const fetchServerStatus = async () => {
+      try {
+        // Example: const response = await fetch('/api/server/status')
+        // const data = await response.json()
+        // setServerInfo(data)
+        // setIsOnline(true)
+
+        // Mock data for demo
+        setServerInfo(prev => ({
+          ...prev,
+          players: Math.floor(Math.random() * 150) + 50,
+          queue: Math.floor(Math.random() * 10),
+          fps: Math.floor(Math.random() * 10) + 55
+        }))
+        setIsOnline(true)
+      } catch (error) {
+        console.error('Failed to fetch server status:', error)
+        setIsOnline(false)
+      }
+    }
+
+    fetchServerStatus()
+    const interval = setInterval(fetchServerStatus, 30000) // Update every 30 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const getPlayerPercentage = () => {
+    return (serverInfo.players / serverInfo.maxPlayers) * 100
+  }
+
+  const getPlayerColor = () => {
+    const percentage = getPlayerPercentage()
+    if (percentage >= 90) return 'text-red-500'
+    if (percentage >= 70) return 'text-yellow-500'
+    return 'text-green-500'
+  }
+
+  const getNextWipeCountdown = () => {
+    const now = new Date()
+    const wipeDate = new Date(serverInfo.nextWipe)
+    const diff = wipeDate.getTime() - now.getTime()
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+
+    return `${days}d ${hours}h`
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Server Header */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <Server className="w-6 h-6 text-rust-500" />
+            {serverInfo.name}
+          </h3>
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+            <span className="text-sm text-dark-300">{isOnline ? 'Online' : 'Offline'}</span>
+          </div>
+        </div>
+
+        {/* Player Count */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-dark-400" />
+              <span className="text-dark-300">Players Online</span>
+            </div>
+            <span className={`text-lg font-bold ${getPlayerColor()}`}>
+              {serverInfo.players} / {serverInfo.maxPlayers}
+            </span>
+          </div>
+          <div className="w-full bg-dark-700 rounded-full h-2">
+            <div
+              className={`h-2 rounded-full transition-all duration-500 ${
+                getPlayerPercentage() >= 90 ? 'bg-red-500' :
+                getPlayerPercentage() >= 70 ? 'bg-yellow-500' : 'bg-green-500'
+              }`}
+              style={{ width: `${getPlayerPercentage()}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Server Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-dark-900 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="w-4 h-4 text-rust-500" />
+              <span className="text-xs text-dark-400">Queue</span>
+            </div>
+            <p className="text-lg font-bold text-white">{serverInfo.queue}</p>
+          </div>
+
+          <div className="bg-dark-900 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Zap className="w-4 h-4 text-rust-500" />
+              <span className="text-xs text-dark-400">FPS</span>
+            </div>
+            <p className="text-lg font-bold text-white">{serverInfo.fps}</p>
+          </div>
+
+          <div className="bg-dark-900 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Map className="w-4 h-4 text-rust-500" />
+              <span className="text-xs text-dark-400">Map</span>
+            </div>
+            <p className="text-sm font-bold text-white truncate">{serverInfo.map}</p>
+          </div>
+
+          <div className="bg-dark-900 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar className="w-4 h-4 text-rust-500" />
+              <span className="text-xs text-dark-400">Next Wipe</span>
+            </div>
+            <p className="text-sm font-bold text-white">{getNextWipeCountdown()}</p>
+          </div>
+        </div>
+
+        {/* Server Info */}
+        <div className="mt-4 pt-4 border-t border-dark-700">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-dark-400">Uptime: {serverInfo.uptime}</span>
+            <span className="text-dark-400">Last Wipe: {new Date(serverInfo.lastWipe).toLocaleDateString()}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="card">
+        <h4 className="font-semibold text-white mb-3">Quick Connect</h4>
+        <div className="space-y-2">
+          <button
+            onClick={() => {
+              // Copy to clipboard
+              navigator.clipboard.writeText('connect artofrust.art:28015')
+            }}
+            className="btn-primary w-full"
+          >
+            Copy Connect Command
+          </button>
+          <button
+            onClick={() => {
+              // Open Steam connect URL
+              window.open('steam://connect/artofrust.art:28015', '_blank')
+            }}
+            className="btn-secondary w-full"
+          >
+            Connect via Steam
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ServerStatus

@@ -1,45 +1,9 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Users, Copy, Check, Server, Shield, Zap } from 'lucide-react'
-import { copyToClipboard as copyToClipboardUtil } from '../utils/clipboard'
+import { Server, Shield, Zap } from 'lucide-react'
 import SEO from '../components/SEO'
+import ServerStatus from '../components/ServerStatus'
 
 const Home = () => {
-  const [copied, setCopied] = useState(false)
-  const [copyError, setCopyError] = useState(false)
-  const [serverStatus, setServerStatus] = useState({
-    online: 19,
-    max: 100,
-    status: 'online'
-  })
-
-  const serverAddress = import.meta.env.VITE_SERVER_ADDRESS || "188.64.33.62:28017"
-  const serverConnectCommand = `client.connect ${serverAddress}`
-
-  const handleCopyToClipboard = async () => {
-    const success = await copyToClipboardUtil(serverConnectCommand)
-
-    if (success) {
-      setCopied(true)
-      setCopyError(false)
-      setTimeout(() => setCopied(false), 2000)
-    } else {
-      setCopyError(true)
-      setTimeout(() => setCopyError(false), 3000)
-    }
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setServerStatus(prev => ({
-        ...prev,
-        online: Math.max(15, Math.min(100, prev.online + Math.floor(Math.random() * 5) - 2))
-      }))
-    }, 30000)
-
-    return () => clearInterval(interval)
-  }, [])
-
   const features = [
     {
       icon: Server,
@@ -64,52 +28,37 @@ const Home = () => {
       <div className="space-y-16">
       <section className="relative bg-gradient-to-br from-dark-800 to-dark-900 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Welcome to <span className="text-rust-500">Art of Rust</span>
-            </h1>
-            <p className="text-xl text-dark-300 mb-8 max-w-3xl mx-auto">
-              Experience Rust like never before. Join our thriving community of survivors, builders, and warriors in the ultimate survival adventure.
-            </p>
-            
-            <div className="bg-dark-700 border border-dark-600 rounded-lg p-6 max-w-md mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-5 h-5 text-rust-500" />
-                  <span className="text-dark-300">Server Status</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-green-500 text-sm font-medium">Online</span>
-                </div>
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                Welcome to <span className="text-rust-500">Art of Rust</span>
+              </h1>
+              <p className="text-xl text-dark-300 mb-8">
+                Experience Rust like never before. Join our thriving community of survivors, builders, and warriors in the ultimate survival adventure.
+              </p>
+              <p className="text-lg text-dark-50 italic mb-4">
+                "Explore. Build. Survive."
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href={import.meta.env.VITE_DISCORD_INVITE || "https://discord.gg/artofrust"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary"
+                >
+                  Join Discord
+                </a>
+                <Link
+                  to="/commands"
+                  className="btn-secondary"
+                >
+                  View Commands
+                </Link>
               </div>
-              
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-dark-400">Players</span>
-                  <span className="text-dark-200">{serverStatus.online}/{serverStatus.max}</span>
-                </div>
-                <div className="w-full bg-dark-600 rounded-full h-2">
-                  <div 
-                    className="bg-rust-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(serverStatus.online / serverStatus.max) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div className="bg-dark-800 rounded-lg p-3">
-                <div className="flex items-center justify-between">
-                  <code className="text-rust-400 text-sm">{serverConnectCommand}</code>
-                  <button
-                    onClick={handleCopyToClipboard}
-                    className="flex items-center space-x-1 text-rust-500 hover:text-rust-400 transition-colors"
-                    aria-label="Copy server connect command"
-                  >
-                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    <span className="text-sm">{copied ? 'Copied!' : copyError ? 'Failed' : 'Copy'}</span>
-                  </button>
-                </div>
-              </div>
+            </div>
+
+            <div>
+              <ServerStatus />
             </div>
           </div>
         </div>

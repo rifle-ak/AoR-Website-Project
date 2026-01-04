@@ -9,6 +9,7 @@ import Footer from './components/Footer'
 const Home = lazy(() => import('./pages/Home'))
 const Commands = lazy(() => import('./pages/Commands'))
 const Gallery = lazy(() => import('./pages/Gallery'))
+const Leaderboards = lazy(() => import('./pages/Leaderboards'))
 const Login = lazy(() => import('./pages/Login'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
@@ -23,6 +24,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/commands" element={<Commands />} />
               <Route path="/gallery" element={<Gallery />} />
+              <Route path="/leaderboards" element={<Leaderboards />} />
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

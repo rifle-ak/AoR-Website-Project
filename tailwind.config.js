@@ -7,30 +7,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Static colors for backward compatibility
+        // Official Rust game brand colors
         rust: {
-          50: '#fef7ed',
-          100: '#fdedd3',
-          200: '#fbd8a5',
-          300: '#f8bc6d',
-          400: '#f59446',
-          500: '#f37320',
-          600: '#e45a16',
-          700: '#bd4315',
-          800: '#973618',
-          900: '#7b2e16',
+          50: '#fdeae8',
+          100: '#fad4d0',
+          200: '#f5a9a1',
+          300: '#f07e72',
+          400: '#eb5343',
+          500: '#cd412b',  // Primary brand color (Valencia)
+          600: '#a43422',
+          700: '#7b271a',
+          800: '#521a11',
+          900: '#290d09',
         },
+        // Updated dark palette to match Rust's gritty aesthetic
         dark: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#e4dad1',   // Pearl Bush (secondary brand color)
+          100: '#c7bdb4',
+          200: '#a9a097',
+          300: '#8c837a',
+          400: '#6e665d',
+          500: '#514940',
+          600: '#3d3630',
+          700: '#292320',
+          800: '#1d1814',
+          900: '#131210',  // Cod Gray (tertiary brand color)
         },
         // Dynamic theme colors using CSS variables
         primary: {
