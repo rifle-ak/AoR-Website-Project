@@ -1,4 +1,4 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 import { Mail, ExternalLink } from 'lucide-react'
 
 const Footer = () => {
@@ -21,9 +21,9 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="/" className="text-dark-400 hover:text-rust-500 transition-colors">Home</a></li>
-              <li><a href="/commands" className="text-dark-400 hover:text-rust-500 transition-colors">Server Commands</a></li>
-              <li><a href="/gallery" className="text-dark-400 hover:text-rust-500 transition-colors">Gallery</a></li>
+              <li><Link to="/" className="text-dark-400 hover:text-rust-500 transition-colors">Home</Link></li>
+              <li><Link to="/commands" className="text-dark-400 hover:text-rust-500 transition-colors">Server Commands</Link></li>
+              <li><Link to="/gallery" className="text-dark-400 hover:text-rust-500 transition-colors">Gallery</Link></li>
               <li><a href="https://upgrade.chat/artofrust" target="_blank" rel="noopener noreferrer" className="text-dark-400 hover:text-rust-500 transition-colors flex items-center space-x-1">
                 <span>Donate</span>
                 <ExternalLink className="w-3 h-3" />
