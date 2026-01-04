@@ -6,6 +6,7 @@ import {
   getPasswordStrength,
   ValidationMessages
 } from '../utils/validation'
+import SEO from '../components/SEO'
 
 interface FormErrors {
   username?: string
@@ -178,7 +179,12 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <SEO
+        title={isLogin ? 'Sign In' : 'Create Account'}
+        description="Sign in to your Art of Rust account or create a new account to access member features, track your stats, and manage your profile."
+      />
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
@@ -442,6 +448,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
