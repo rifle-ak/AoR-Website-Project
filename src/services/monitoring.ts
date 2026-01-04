@@ -70,9 +70,13 @@ export function logError(error: Error, context?: ErrorContext): void {
 /**
  * Log a message to monitoring service
  */
-export function logMessage(message: string, level: 'info' | 'warning' | 'error' = 'info'): void {
+export function logMessage(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
   if (import.meta.env.DEV) {
-    console[level](message)
+    if (level === 'warn') {
+      console.warn(message)
+    } else {
+      console[level](message)
+    }
   }
 
   // Uncomment when Sentry is configured
@@ -125,7 +129,7 @@ export function clearUserContext(): void {
 /**
  * Add breadcrumb for debugging context
  */
-export function addBreadcrumb(message: string, category?: string, level?: 'info' | 'warning' | 'error'): void {
+export function addBreadcrumb(message: string, category?: string, _level?: 'info' | 'warning' | 'error'): void {
   if (import.meta.env.DEV) {
     console.log(`[Breadcrumb] ${category || 'general'}: ${message}`)
   }
