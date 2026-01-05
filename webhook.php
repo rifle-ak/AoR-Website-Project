@@ -5,7 +5,7 @@
  */
 
 // Configuration
-define('DEPLOY_SCRIPT', __DIR__ . '/deploy.sh');
+define('DEPLOY_SCRIPT', __DIR__ . '/deploy-artofrust.sh');
 define('LOG_FILE', __DIR__ . '/webhook.log');
 define('SECRET_TOKEN', getenv('WEBHOOK_SECRET') ?: 'change-this-secret'); // Set in .env
 
