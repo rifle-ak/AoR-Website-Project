@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Twitter, Youtube, Instagram } from 'lucide-react'
+import { Menu, X, Twitter, Youtube, Instagram, LogOut, User as UserIcon, Shield } from 'lucide-react'
 import ThemeSwitcher from './ThemeSwitcher'
+import { useAuth } from '../contexts/AuthContext'
 
 // Discord icon component (lucide-react doesn't include Discord)
 const Discord = ({ className }: { className?: string }) => (
@@ -12,15 +13,19 @@ const Discord = ({ className }: { className?: string }) => (
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const location = useLocation()
+  const { user, login, logout } = useAuth()
 
   const leaderboardsEnabled = import.meta.env.VITE_ENABLE_LEADERBOARDS === 'true'
 
   const navigation = [
     { name: 'Home', href: '/' },
+    { name: 'News', href: '/news' },
     ...(leaderboardsEnabled ? [{ name: 'Leaderboards', href: '/leaderboards' }] : []),
     { name: 'Wipe Schedule', href: '/wipe-schedule' },
     { name: 'Commands', href: '/commands' },
+    { name: 'Rules', href: '/rules' },
     { name: 'Gallery', href: '/gallery' },
   ]
 
@@ -74,12 +79,69 @@ const Navbar = () => {
               </a>
             ))}
             <ThemeSwitcher />
-            <Link
-              to="/login"
-              className="btn-primary text-sm"
-            >
-              Login
-            </Link>
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                >
+                  {user.avatarUrl && (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-8 h-8 rounded-full border-2 border-rust-500"
+                    />
+                  )}
+                  <span className="text-white text-sm font-medium">{user.displayName}</span>
+                </button>
+
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-48 bg-dark-800 border border-dark-700 rounded-lg shadow-lg z-20">
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-2 px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        My Profile
+                      </Link>
+                      {user.isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2 px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <Shield className="w-4 h-4" />
+                          Admin Panel
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout()
+                          setUserMenuOpen(false)
+                        }}
+                        className="flex items-center gap-2 w-full px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors border-t border-dark-700"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={login}
+                className="btn-primary text-sm"
+              >
+                Login with Steam
+              </button>
+            )}
           </div>
 
           <div className="md:hidden flex items-center">
@@ -127,13 +189,59 @@ const Navbar = () => {
             <div className="px-3 py-2">
               <ThemeSwitcher />
             </div>
-            <Link
-              to="/login"
-              className="block px-3 py-2 btn-primary text-center"
-              onClick={() => setIsOpen(false)}
-            >
-              Login
-            </Link>
+            {user ? (
+              <div className="px-3 py-2">
+                <div className="flex items-center space-x-3 mb-3 pb-3 border-b border-dark-700">
+                  {user.avatarUrl && (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-8 h-8 rounded-full border-2 border-rust-500"
+                    />
+                  )}
+                  <span className="text-white text-sm font-medium">{user.displayName}</span>
+                </div>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-dark-300 hover:text-white hover:bg-dark-700 mb-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <UserIcon className="w-4 h-4" />
+                  My Profile
+                </Link>
+                {user.isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md text-dark-300 hover:text-white hover:bg-dark-700 mb-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Shield className="w-4 h-4" />
+                    Admin Panel
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    logout()
+                    setIsOpen(false)
+                  }}
+                  className="w-full btn-secondary text-sm mt-2"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="px-3 py-2">
+                <button
+                  onClick={() => {
+                    login()
+                    setIsOpen(false)
+                  }}
+                  className="w-full btn-primary text-sm"
+                >
+                  Login with Steam
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

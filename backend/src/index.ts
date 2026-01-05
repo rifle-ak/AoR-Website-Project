@@ -2,7 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import session from 'express-session'
 import cron from 'node-cron'
+import passport from './config/passport.js'
 import { env } from './config/env.js'
 import { rustPlusService } from './services/rustplus.service.js'
 import { serverService } from './services/server.service.js'
@@ -19,6 +21,21 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'))
+
+// Session middleware for Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  }
+}))
+
+// Passport initialization
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Routes
 app.use('/api', routes)

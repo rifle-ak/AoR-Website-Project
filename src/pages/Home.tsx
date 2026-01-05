@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Server, Shield, Zap } from 'lucide-react'
 import SEO from '../components/SEO'
 import ServerStatus from '../components/ServerStatus'
+import DiscordWidget from '../components/DiscordWidget'
 
 const Home = () => {
   const features = [
@@ -57,8 +58,9 @@ const Home = () => {
               </div>
             </div>
 
-            <div>
+            <div className="space-y-4">
               <ServerStatus />
+              <DiscordWidget />
             </div>
           </div>
         </div>
