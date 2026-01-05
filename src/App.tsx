@@ -4,6 +4,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import LoadingSpinner from './components/LoadingSpinner'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import ConnectionStatus from './components/ConnectionStatus'
 
 // Lazy load pages for code splitting
 const Home = lazy(() => import('./pages/Home'))
@@ -47,6 +48,7 @@ function App() {
           </Suspense>
         </main>
         <Footer />
+        <ConnectionStatus />
       </div>
     </ErrorBoundary>
   )
