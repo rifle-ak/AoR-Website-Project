@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Twitter, Youtube, Instagram, LogOut } from 'lucide-react'
+import { Menu, X, Twitter, Youtube, Instagram, LogOut, User as UserIcon, Shield } from 'lucide-react'
 import ThemeSwitcher from './ThemeSwitcher'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -13,6 +13,7 @@ const Discord = ({ className }: { className?: string }) => (
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const location = useLocation()
   const { user, login, logout } = useAuth()
 
@@ -24,6 +25,7 @@ const Navbar = () => {
     ...(leaderboardsEnabled ? [{ name: 'Leaderboards', href: '/leaderboards' }] : []),
     { name: 'Wipe Schedule', href: '/wipe-schedule' },
     { name: 'Commands', href: '/commands' },
+    { name: 'Rules', href: '/rules' },
     { name: 'Gallery', href: '/gallery' },
   ]
 
@@ -78,22 +80,59 @@ const Navbar = () => {
             ))}
             <ThemeSwitcher />
             {user ? (
-              <div className="flex items-center space-x-3">
-                {user.avatarUrl && (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.displayName}
-                    className="w-8 h-8 rounded-full border-2 border-rust-500"
-                  />
-                )}
-                <span className="text-white text-sm font-medium">{user.displayName}</span>
+              <div className="relative">
                 <button
-                  onClick={logout}
-                  className="text-dark-400 hover:text-rust-500 transition-colors"
-                  aria-label="Logout"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                 >
-                  <LogOut className="w-5 h-5" />
+                  {user.avatarUrl && (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-8 h-8 rounded-full border-2 border-rust-500"
+                    />
+                  )}
+                  <span className="text-white text-sm font-medium">{user.displayName}</span>
                 </button>
+
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-48 bg-dark-800 border border-dark-700 rounded-lg shadow-lg z-20">
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-2 px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        My Profile
+                      </Link>
+                      {user.isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2 px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <Shield className="w-4 h-4" />
+                          Admin Panel
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout()
+                          setUserMenuOpen(false)
+                        }}
+                        className="flex items-center gap-2 w-full px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors border-t border-dark-700"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <button
@@ -152,7 +191,7 @@ const Navbar = () => {
             </div>
             {user ? (
               <div className="px-3 py-2">
-                <div className="flex items-center space-x-3 mb-2">
+                <div className="flex items-center space-x-3 mb-3 pb-3 border-b border-dark-700">
                   {user.avatarUrl && (
                     <img
                       src={user.avatarUrl}
@@ -162,12 +201,30 @@ const Navbar = () => {
                   )}
                   <span className="text-white text-sm font-medium">{user.displayName}</span>
                 </div>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-dark-300 hover:text-white hover:bg-dark-700 mb-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <UserIcon className="w-4 h-4" />
+                  My Profile
+                </Link>
+                {user.isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md text-dark-300 hover:text-white hover:bg-dark-700 mb-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Shield className="w-4 h-4" />
+                    Admin Panel
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     logout()
                     setIsOpen(false)
                   }}
-                  className="w-full btn-secondary text-sm"
+                  className="w-full btn-secondary text-sm mt-2"
                 >
                   Logout
                 </button>

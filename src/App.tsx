@@ -12,6 +12,9 @@ const Gallery = lazy(() => import('./pages/Gallery'))
 const Leaderboards = lazy(() => import('./pages/Leaderboards'))
 const WipeSchedule = lazy(() => import('./pages/WipeSchedule'))
 const News = lazy(() => import('./pages/News'))
+const Rules = lazy(() => import('./pages/Rules'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Admin = lazy(() => import('./pages/Admin'))
 const Login = lazy(() => import('./pages/Login'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
@@ -29,6 +32,9 @@ function App() {
               <Route path="/leaderboards" element={<Leaderboards />} />
               <Route path="/wipe-schedule" element={<WipeSchedule />} />
               <Route path="/news" element={<News />} />
+              <Route path="/rules" element={<Rules />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
