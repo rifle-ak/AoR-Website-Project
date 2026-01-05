@@ -15,6 +15,9 @@ const News = lazy(() => import('./pages/News'))
 const Rules = lazy(() => import('./pages/Rules'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Admin = lazy(() => import('./pages/Admin'))
+const AdminNews = lazy(() => import('./pages/AdminNews'))
+const AdminUsers = lazy(() => import('./pages/AdminUsers'))
+const AdminWipes = lazy(() => import('./pages/AdminWipes'))
 const Login = lazy(() => import('./pages/Login'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
@@ -35,6 +38,9 @@ function App() {
               <Route path="/rules" element={<Rules />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/news" element={<AdminNews />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/wipes" element={<AdminWipes />} />
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

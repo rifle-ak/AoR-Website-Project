@@ -179,7 +179,10 @@ const Admin = () => {
 
             {/* Quick Actions */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="card hover:border-rust-500/50 transition-colors cursor-pointer">
+              <div
+                onClick={() => navigate('/admin/news')}
+                className="card hover:border-rust-500/50 transition-colors cursor-pointer"
+              >
                 <Newspaper className="w-8 h-8 text-rust-500 mb-3" />
                 <h3 className="text-lg font-bold text-white mb-2">Manage News</h3>
                 <p className="text-dark-400 text-sm mb-4">
@@ -190,7 +193,10 @@ const Admin = () => {
                 </button>
               </div>
 
-              <div className="card hover:border-rust-500/50 transition-colors cursor-pointer">
+              <div
+                onClick={() => navigate('/admin/users')}
+                className="card hover:border-rust-500/50 transition-colors cursor-pointer"
+              >
                 <Users className="w-8 h-8 text-blue-500 mb-3" />
                 <h3 className="text-lg font-bold text-white mb-2">Manage Users</h3>
                 <p className="text-dark-400 text-sm mb-4">
@@ -201,7 +207,10 @@ const Admin = () => {
                 </button>
               </div>
 
-              <div className="card hover:border-rust-500/50 transition-colors cursor-pointer">
+              <div
+                onClick={() => navigate('/admin/wipes')}
+                className="card hover:border-rust-500/50 transition-colors cursor-pointer"
+              >
                 <Calendar className="w-8 h-8 text-purple-500 mb-3" />
                 <h3 className="text-lg font-bold text-white mb-2">Wipe Schedule</h3>
                 <p className="text-dark-400 text-sm mb-4">
