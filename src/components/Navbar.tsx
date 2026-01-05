@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Twitter, Youtube, Instagram } from 'lucide-react'
+import { Menu, X, Twitter, Youtube, Instagram, LogOut } from 'lucide-react'
 import ThemeSwitcher from './ThemeSwitcher'
+import { useAuth } from '../contexts/AuthContext'
 
 // Discord icon component (lucide-react doesn't include Discord)
 const Discord = ({ className }: { className?: string }) => (
@@ -13,11 +14,13 @@ const Discord = ({ className }: { className?: string }) => (
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
+  const { user, login, logout } = useAuth()
 
   const leaderboardsEnabled = import.meta.env.VITE_ENABLE_LEADERBOARDS === 'true'
 
   const navigation = [
     { name: 'Home', href: '/' },
+    { name: 'News', href: '/news' },
     ...(leaderboardsEnabled ? [{ name: 'Leaderboards', href: '/leaderboards' }] : []),
     { name: 'Wipe Schedule', href: '/wipe-schedule' },
     { name: 'Commands', href: '/commands' },
@@ -74,12 +77,32 @@ const Navbar = () => {
               </a>
             ))}
             <ThemeSwitcher />
-            <Link
-              to="/login"
-              className="btn-primary text-sm"
-            >
-              Login
-            </Link>
+            {user ? (
+              <div className="flex items-center space-x-3">
+                {user.avatarUrl && (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.displayName}
+                    className="w-8 h-8 rounded-full border-2 border-rust-500"
+                  />
+                )}
+                <span className="text-white text-sm font-medium">{user.displayName}</span>
+                <button
+                  onClick={logout}
+                  className="text-dark-400 hover:text-rust-500 transition-colors"
+                  aria-label="Logout"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={login}
+                className="btn-primary text-sm"
+              >
+                Login with Steam
+              </button>
+            )}
           </div>
 
           <div className="md:hidden flex items-center">
@@ -127,13 +150,41 @@ const Navbar = () => {
             <div className="px-3 py-2">
               <ThemeSwitcher />
             </div>
-            <Link
-              to="/login"
-              className="block px-3 py-2 btn-primary text-center"
-              onClick={() => setIsOpen(false)}
-            >
-              Login
-            </Link>
+            {user ? (
+              <div className="px-3 py-2">
+                <div className="flex items-center space-x-3 mb-2">
+                  {user.avatarUrl && (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-8 h-8 rounded-full border-2 border-rust-500"
+                    />
+                  )}
+                  <span className="text-white text-sm font-medium">{user.displayName}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    logout()
+                    setIsOpen(false)
+                  }}
+                  className="w-full btn-secondary text-sm"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="px-3 py-2">
+                <button
+                  onClick={() => {
+                    login()
+                    setIsOpen(false)
+                  }}
+                  className="w-full btn-primary text-sm"
+                >
+                  Login with Steam
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

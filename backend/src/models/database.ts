@@ -16,6 +16,16 @@ db.pragma('journal_mode = WAL')
 
 // Initialize database schema
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    steam_id TEXT PRIMARY KEY,
+    display_name TEXT NOT NULL,
+    avatar_url TEXT,
+    is_admin BOOLEAN DEFAULT 0,
+    is_vip BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS players (
     steam_id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -39,6 +49,18 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS news (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    excerpt TEXT,
+    author_steam_id TEXT,
+    published BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_steam_id) REFERENCES users(steam_id)
+  );
+
   CREATE TABLE IF NOT EXISTS server_stats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -52,6 +74,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_players_kd ON players((CAST(kills AS REAL) / NULLIF(deaths, 0)) DESC);
   CREATE INDEX IF NOT EXISTS idx_players_playtime ON players(playtime DESC);
   CREATE INDEX IF NOT EXISTS idx_wipes_date ON wipes(date DESC);
+  CREATE INDEX IF NOT EXISTS idx_news_created ON news(created_at DESC);
 `)
 
 console.log('✅ Database initialized')
