@@ -1,6 +1,6 @@
 # Art of Rust Website
 
-Official website for the Art of Rust gaming community - a premium Rust gaming experience with dedicated servers and an amazing community.
+Official website for the Art of Rust gaming community - a premium Rust gaming experience with dedicated servers and an amazing community...
 
 ## Tech Stack
 
