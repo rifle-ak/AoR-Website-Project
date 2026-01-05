@@ -19,7 +19,6 @@
     "morgan": "^1.10.0",
     "node-cron": "^3.0.3",
     "better-sqlite3": "^9.2.2",
-    "rustplus.js": "^3.2.1",
     "axios": "^1.6.2",
     "zod": "^3.22.4",
     "passport": "^0.7.0",
