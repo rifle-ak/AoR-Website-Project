@@ -1,3 +1,4 @@
+import { steamQueryService } from './steamquery.service.js'
 import { rustPlusService, ServerInfo } from './rustplus.service.js'
 import { env } from '../config/env.js'
 
@@ -10,7 +11,29 @@ class ServerService {
   }
 
   async getStatus(): Promise<ServerInfo> {
-    // Try Rust+ first if enabled
+    // Try Steam Query first (most reliable and no setup needed)
+    try {
+      const steamStatus = await steamQueryService.getServerStatus()
+      if (steamStatus && steamStatus.online) {
+        return {
+          name: steamStatus.name,
+          players: steamStatus.players,
+          maxPlayers: steamStatus.maxPlayers,
+          queue: steamStatus.queue,
+          map: steamStatus.map,
+          mapSize: 4000, // Steam Query doesn't provide this
+          mapSeed: 0,    // Steam Query doesn't provide this
+          fps: 60,       // Steam Query doesn't provide this
+          uptime: 0,     // Steam Query doesn't provide this
+          online: true,
+          lastUpdate: steamStatus.lastUpdate
+        }
+      }
+    } catch (error) {
+      console.error('Steam Query failed, trying Rust+:', error)
+    }
+
+    // Try Rust+ as fallback if enabled
     if (env.ENABLE_RUST_PLUS) {
       const rustInfo = await rustPlusService.getServerInfo()
       if (rustInfo) {
@@ -18,18 +41,18 @@ class ServerService {
       }
     }
 
-    // Fallback to manual/configured stats
+    // Final fallback to manual/configured stats
     return {
       name: process.env.VITE_SERVER_NAME || 'Art of Rust | Main Server',
       players: this.manualStats.players,
-      maxPlayers: parseInt(env.RUST_SERVER_PORT) || 200,
+      maxPlayers: 200,
       queue: this.manualStats.queue,
       map: 'Procedural Map',
       mapSize: 4000,
       mapSeed: 0,
       fps: this.manualStats.fps,
       uptime: this.manualStats.uptime,
-      online: true,
+      online: false,
       lastUpdate: new Date()
     }
   }
