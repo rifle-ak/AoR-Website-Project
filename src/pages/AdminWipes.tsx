@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Plus, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react'
+import { Calendar, Plus, CheckCircle } from 'lucide-react'
 import SEO from '../components/SEO'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -19,7 +19,7 @@ const AdminWipes = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [wipes, setWipes] = useState<Wipe[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState({
     type: 'full' as 'full' | 'map' | 'bp',

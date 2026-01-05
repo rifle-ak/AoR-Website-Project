@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Wifi, WifiOff } from 'lucide-react'
+import { WifiOff } from 'lucide-react'
 
 const ConnectionStatus = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
