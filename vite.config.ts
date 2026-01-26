@@ -62,9 +62,18 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true
+    host: true,
+    // Proxy API requests to PHP during development
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
+    // Output directory for cPanel deployment
+    outDir: 'dist',
     // Security-related build options
     sourcemap: false, // Disable sourcemaps in production for security
     minify: 'terser',
@@ -72,6 +81,14 @@ export default defineConfig({
       compress: {
         drop_console: true, // Remove console logs in production
         drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        // Ensure assets have predictable names
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
   },
