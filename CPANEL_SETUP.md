@@ -17,12 +17,23 @@ Everything runs on standard cPanel hosting - no Node.js required!
 - PHP 7.4+ (PHP 8.0+ recommended)
 - MySQL 5.7+ or MariaDB 10.2+
 - FTP access or cPanel File Manager
+- Node.js 18+ on your LOCAL machine (for building only)
 
-## Step 1: Build the Frontend
+## IMPORTANT: Build Locally, Upload Files
 
-On your local machine:
+> **DO NOT** clone this repository directly into `public_html`!
+>
+> The repo contains source files that need to be compiled. You must:
+> 1. Build on your local machine
+> 2. Upload only the compiled files to your server
+
+## Step 1: Build the Frontend (On Your Local Machine)
 
 ```bash
+# Clone the repo locally (NOT on the server)
+git clone <repository-url>
+cd AoR-Website-Project
+
 # Install dependencies
 npm install
 
@@ -31,6 +42,16 @@ npm run build
 ```
 
 This creates a `dist` folder with the compiled frontend.
+
+### Quick Package Option
+
+Or use the deploy script to create a ready-to-upload zip:
+
+```bash
+./deploy.sh
+```
+
+This creates `artofrust-deploy-YYYYMMDD-HHMMSS.zip` containing everything you need.
 
 ## Step 2: Create MySQL Database
 
@@ -152,11 +173,30 @@ assets/            755
    ini_set('display_errors', '1');
    ```
 
+### Blank white page
+
+1. Check browser console (F12) for JavaScript errors
+2. Verify `index.html` exists in `public_html` root (not in a subfolder)
+3. Verify `assets/` folder with `.js` and `.css` files exists
+4. Check that you uploaded from `dist/` folder, not the source repo
+
+### "Request exceeded the limit of 10 internal redirects"
+
+This is an infinite redirect loop. Causes:
+1. **Wrong file structure**: You may have cloned the repo into `public_html` instead of uploading built files
+2. **Missing index.html**: The `.htaccess` can't find `index.html` to serve
+
+**Fix:**
+1. Delete everything in `public_html`
+2. Upload ONLY: `dist/*` contents, `api/` folder, and `public/.htaccess`
+3. Verify `index.html` is at `public_html/index.html` (not in a subfolder)
+
 ### "404 Not Found" on page refresh
 
 The `.htaccess` isn't working. Check:
-1. `.htaccess` is uploaded to `public_html`
+1. `.htaccess` is uploaded to `public_html` root
 2. `mod_rewrite` is enabled (contact host)
+3. The `.htaccess` file wasn't renamed (some FTP clients hide dotfiles)
 
 ### "Database connection failed"
 
