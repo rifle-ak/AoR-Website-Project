@@ -4,7 +4,7 @@ import { WifiOff } from 'lucide-react'
 const ConnectionStatus = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
   const [isChecking, setIsChecking] = useState(true)
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+  const API_URL = import.meta.env.VITE_API_URL || '/api'
 
   useEffect(() => {
     checkConnection()
@@ -56,13 +56,13 @@ const ConnectionStatus = () => {
                 How to fix
               </summary>
               <ol className="mt-2 space-y-1 text-red-100 list-decimal list-inside">
-                <li>Open a terminal in the project folder</li>
-                <li>Run: <code className="bg-red-600/50 px-1 rounded">cd backend && npm start</code></li>
-                <li>Wait for "Server: http://localhost:3001"</li>
-                <li>Refresh this page</li>
+                <li>Verify the api/ folder is uploaded</li>
+                <li>Check api/config.php has correct database settings</li>
+                <li>Import api/schema.sql into MySQL</li>
+                <li>Test: visit /api/health in your browser</li>
               </ol>
               <p className="mt-2 text-red-100">
-                See <code className="bg-red-600/50 px-1 rounded">QUICKSTART.md</code> for detailed setup
+                See <code className="bg-red-600/50 px-1 rounded">CPANEL_SETUP.md</code> for detailed setup
               </p>
             </details>
           </div>
