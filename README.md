@@ -4,6 +4,7 @@ Official website for the Art of Rust gaming community - a premium Rust gaming ex
 
 ## Tech Stack
 
+### Frontend
 - **Framework:** React 18
 - **Language:** TypeScript
 - **Build Tool:** Vite
@@ -12,6 +13,12 @@ Official website for the Art of Rust gaming community - a premium Rust gaming ex
 - **Icons:** Lucide React
 - **UI Components:** Radix UI
 - **Animations:** Framer Motion
+
+### Backend (PHP API)
+- **Language:** PHP 7.4+
+- **Database:** MySQL/MariaDB
+- **Authentication:** Steam OpenID + JWT
+- **Server Query:** Steam A2S Protocol
 
 ## Prerequisites
 
@@ -71,18 +78,33 @@ npm run lint
 ## Project Structure
 
 ```
-src/
-├── components/       # Reusable UI components
-│   ├── Navbar.tsx   # Navigation bar with responsive menu
-│   └── Footer.tsx   # Site footer with links
-├── pages/           # Route pages
-│   ├── Home.tsx     # Homepage with server status
-│   ├── Commands.tsx # Server commands list
-│   ├── Gallery.tsx  # Community screenshots gallery
-│   └── Login.tsx    # Login/signup page
-├── App.tsx          # Main app component with routing
-├── main.tsx         # Application entry point
-└── index.css        # Global styles and Tailwind directives
+├── src/                    # React frontend source
+│   ├── components/         # Reusable UI components
+│   ├── pages/              # Route pages
+│   ├── services/           # API service layer
+│   ├── contexts/           # React contexts (Auth, Theme)
+│   ├── hooks/              # Custom React hooks
+│   └── config/             # Configuration (themes)
+│
+├── api/                    # PHP Backend API
+│   ├── config.php          # Configuration (database, Steam, etc.)
+│   ├── index.php           # API router
+│   ├── schema.sql          # MySQL database schema
+│   ├── includes/           # Core PHP classes
+│   │   ├── Database.php    # MySQL connection
+│   │   ├── JWT.php         # JWT authentication
+│   │   ├── SteamAuth.php   # Steam OpenID login
+│   │   └── SteamQuery.php  # Server status query
+│   └── routes/             # API endpoint handlers
+│       ├── auth.php        # Authentication endpoints
+│       ├── server.php      # Server status
+│       ├── leaderboards.php
+│       ├── news.php
+│       ├── wipes.php
+│       └── admin.php
+│
+├── public/                 # Static assets & .htaccess
+└── dist/                   # Built frontend (after npm run build)
 ```
 
 ## Available Scripts
@@ -274,19 +296,36 @@ Custom color schemes and theme settings are in `tailwind.config.js`:
 
 See [PROJECT_REVIEW.md](./PROJECT_REVIEW.md) for a comprehensive list of issues and improvement areas.
 
-### Current Limitations
+### Notes
 
-- Server status is mock data (not connected to real server)
-- Login functionality is UI only (no backend integration)
 - Gallery images are placeholder content
-- No error boundaries implemented
-- No testing infrastructure
+- Player stats require manual entry or integration with game plugins
 
 ## Deployment
 
-### Recommended Platforms
+### Recommended: cPanel Hosting
 
-- **Vercel** - Automatic deployments from Git
+This project is designed to run on standard cPanel hosting - **no Node.js server required!**
+
+1. Build the frontend: `npm run build`
+2. Upload `dist/*` and `api/` to your `public_html` folder
+3. Set up MySQL database and import `api/schema.sql`
+4. Configure `api/config.php` with your settings
+
+**See [CPANEL_SETUP.md](./CPANEL_SETUP.md) for detailed instructions.**
+
+### Quick Deploy Script
+
+```bash
+# Build and package for deployment
+./deploy.sh
+```
+
+This creates a zip file ready for upload to cPanel.
+
+### Alternative Platforms
+
+- **Vercel** - Works with serverless functions for API
 - **Netlify** - Simple hosting with CI/CD
 - **CloudFlare Pages** - Fast global CDN
 

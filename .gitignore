@@ -46,3 +46,6 @@ Thumbs.db
 
 # Production
 *.tgz
+*.zip
+deploy-package/
+artofrust-deploy-*.zip
