@@ -294,10 +294,6 @@ Custom color schemes and theme settings are in `tailwind.config.js`:
 
 ## Known Issues
 
-See [PROJECT_REVIEW.md](./PROJECT_REVIEW.md) for a comprehensive list of issues and improvement areas.
-
-### Notes
-
 - Gallery images are placeholder content
 - Player stats require manual entry or integration with game plugins
 
