@@ -2,8 +2,7 @@
 /**
  * Art of Rust - API Configuration
  *
- * This file contains all configuration settings for the PHP backend.
- * Copy this to config.php and update values for your environment.
+ * IMPORTANT: Edit this file with your actual settings before deploying!
  */
 
 // Prevent direct access
