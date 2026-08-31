@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Art of Rust">
+    <rect width="32" height="32" rx="7" fill="#cd412b"/>
+    <text x="16" y="21" font-family="Inter, system-ui, sans-serif" font-size="11"
+          font-weight="700" fill="#ffffff" text-anchor="middle">AOR</text>
+</svg>

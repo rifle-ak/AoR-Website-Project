@@ -1,361 +1,174 @@
 # Art of Rust Website
 
-Official website for the Art of Rust gaming community - a premium Rust gaming experience with dedicated servers and an amazing community.
+Official website for the Art of Rust gaming community - a premium Rust gaming
+experience with dedicated servers and an amazing community.
 
-## Tech Stack
+**There is no build step.** The site is plain PHP: clone it into `public_html`,
+fill in one config file, and it runs. No Node, no npm, no compiled bundle.
 
-### Frontend
-- **Framework:** React 18
-- **Language:** TypeScript
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS
-- **Routing:** React Router v6
-- **Icons:** Lucide React
-- **UI Components:** Radix UI
-- **Animations:** Framer Motion
+## Tech stack
 
-### Backend (PHP API)
-- **Language:** PHP 7.4+
-- **Database:** MySQL/MariaDB
-- **Authentication:** Steam OpenID + JWT
-- **Server Query:** Steam A2S Protocol
+- **Language:** PHP 7.4+ (8.0+ recommended)
+- **Database:** MySQL 5.7+ / MariaDB 10.2+
+- **Authentication:** Steam OpenID, session cookies for the site and JWT bearer
+  tokens for the JSON API
+- **Server query:** Steam A2S protocol
+- **Front end:** server-rendered HTML, hand-written CSS, ~500 lines of vanilla
+  JavaScript. No frameworks and no dependencies to install.
 
-## Prerequisites
+## Layout
 
-- Node.js 18+
-- npm 9+ or yarn 1.22+
+```
+index.php            Front controller - every page request enters here
+.htaccess            Routing, security headers, caching
+app/                 Application source (never served directly)
+  bootstrap.php        Config, includes, session
+  Auth.php             Steam sign-in and session handling
+  Data.php             Every database and server query the site makes
+  helpers.php          Escaping, formatting, view rendering
+  themes.php           The five colour themes
+  content.php          Editable page copy: commands, rules, gallery
+  icons.php            Inline SVG icons (generated - see tools/)
+  actions/             Form handlers for sign-in and the admin pages
+  views/               Layout, partials and one file per page
+api/                  JSON API - same data, different presentation
+  config.php           All configuration lives here
+  schema.sql           Database schema
+assets/               CSS, JavaScript, images
+tools/                Development helpers, not deployed
+```
 
-## Getting Started
+`app/Data.php` is the single source of truth for data access. The HTML pages
+render its return values; the JSON API wraps the same functions in
+`Response::json()`. Neither half can drift away from the other.
 
-### Installation
+## Local development
 
-1. Clone the repository:
+You need PHP with `pdo_mysql`, and a MySQL or MariaDB server.
+
 ```bash
-git clone <repository-url>
-cd AoR-Website-Project
+# 1. Create the database and import the schema
+mysql -u root -p -e "CREATE DATABASE artofrust_db"
+mysql -u root -p artofrust_db < api/schema.sql
+
+# 2. Point the site at it (this file is gitignored)
+cat > api/config.local.php <<'PHP'
+<?php
+define('DB_USER', 'root');
+define('DB_PASS', 'your_password');
+define('SITE_URL', 'http://localhost:8000');
+PHP
+
+# 3. Run it
+php -S localhost:8000 -t . tools/router.php
 ```
 
-2. Install dependencies:
+Open <http://localhost:8000>. `tools/router.php` reproduces what `.htaccess`
+does on Apache, so the built-in server behaves like the real host.
+
+To check everything responds:
+
 ```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your configuration values.
-
-### Development
-
-Start the development server:
-```bash
-npm run dev
-```
-
-The site will be available at `http://localhost:3000`
-
-### Building for Production
-
-Build the project:
-```bash
-npm run build
-```
-
-Preview the production build:
-```bash
-npm run preview
-```
-
-### Linting
-
-Run ESLint:
-```bash
-npm run lint
-```
-
-## Project Structure
-
-```
-├── src/                    # React frontend source
-│   ├── components/         # Reusable UI components
-│   ├── pages/              # Route pages
-│   ├── services/           # API service layer
-│   ├── contexts/           # React contexts (Auth, Theme)
-│   ├── hooks/              # Custom React hooks
-│   └── config/             # Configuration (themes)
-│
-├── api/                    # PHP Backend API
-│   ├── config.php          # Configuration (database, Steam, etc.)
-│   ├── index.php           # API router
-│   ├── schema.sql          # MySQL database schema
-│   ├── includes/           # Core PHP classes
-│   │   ├── Database.php    # MySQL connection
-│   │   ├── JWT.php         # JWT authentication
-│   │   ├── SteamAuth.php   # Steam OpenID login
-│   │   └── SteamQuery.php  # Server status query
-│   └── routes/             # API endpoint handlers
-│       ├── auth.php        # Authentication endpoints
-│       ├── server.php      # Server status
-│       ├── leaderboards.php
-│       ├── news.php
-│       ├── wipes.php
-│       └── admin.php
-│
-├── public/                 # Static assets & .htaccess
-└── dist/                   # Built frontend (after npm run build)
-```
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## Features
-
-### Current Features
-
-- **Customizable Themes** - 5 built-in themes with localStorage persistence
-  - Rust (default) - Official game-inspired theme
-  - Dark - Clean modern dark theme
-  - Light - Bright and accessible
-  - Forest - Nature-inspired green
-  - Ocean - Deep blue ocean theme
-- Responsive navigation with mobile menu
-- Server status display (currently mock data)
-- Commands list with search and copy functionality
-- Community gallery with category filtering
-- Login/signup interface with comprehensive validation
-- Error boundaries for graceful error handling
-- Clipboard utilities with fallback support
-
-### Planned Features
-
-- Real-time server status integration
-- User authentication and profiles
-- Admin panel for content management
-- Gallery image upload
-- Analytics integration
-- Performance optimizations
-- SEO enhancements
-- Custom theme creator
-
-## Theming System
-
-The application includes a powerful theming system with multiple pre-built themes and full customization support.
-
-### Available Themes
-
-1. **Rust** (Default) - Post-apocalyptic theme inspired by the game
-   - Orange/rust primary colors
-   - Dark, gritty atmosphere
-   - Perfect for the gaming aesthetic
-
-2. **Dark** - Clean modern dark theme
-   - Sky blue accents
-   - True black backgrounds
-   - Minimal and sleek
-
-3. **Light** - Bright and accessible
-   - High contrast for readability
-   - Professional appearance
-   - Great for daytime use
-
-4. **Forest** - Nature-inspired green theme
-   - Earthy green tones
-   - Calming atmosphere
-   - Unique alternative style
-
-5. **Ocean** - Deep blue ocean theme
-   - Cyan/teal accents
-   - Underwater vibes
-   - Cool and refreshing
-
-### Using Themes
-
-**In the UI:**
-- Click the theme picker button in the navigation bar (palette icon)
-- Select your preferred theme from the dropdown
-- Theme preference is automatically saved to localStorage
-
-**In Code:**
-
-```tsx
-import { useTheme } from './contexts/ThemeContext'
-
-function MyComponent() {
-  const { theme, themeId, setTheme, availableThemes } = useTheme()
-
-  // Access current theme
-  console.log(theme.name) // "Rust"
-
-  // Change theme
-  setTheme('dark')
-
-  // Access theme colors
-  const primaryColor = theme.colors.primary[500]
-}
-```
-
-### Creating Custom Themes
-
-Add new themes in `src/config/themes.ts`:
-
-```typescript
-export const myCustomTheme: Theme = {
-  id: 'custom',
-  name: 'Custom Theme',
-  description: 'My custom theme',
-  colors: {
-    primary: { /* ... */ },
-    background: { /* ... */ },
-    surface: { /* ... */ },
-    text: { /* ... */ },
-    status: { /* ... */ },
-  },
-  effects: {
-    shadow: '0 4px 6px rgba(0,0,0,0.3)',
-    borderRadius: '0.5rem',
-    glowColor: 'rgba(255,0,0,0.2)', // Optional
-  }
-}
-
-// Add to themes object
-export const themes = {
-  // ...existing themes
-  custom: myCustomTheme,
-}
-```
-
-### Theme CSS Variables
-
-Themes automatically apply CSS variables that can be used in Tailwind classes:
-
-- `primary-{50-900}` - Primary brand colors
-- `bg-main`, `bg-secondary`, `bg-tertiary` - Background colors
-- `surface-main`, `surface-secondary`, `surface-hover`, `surface-border` - Surface/card colors
-- `text-primary`, `text-secondary`, `text-tertiary`, `text-disabled` - Text colors
-- `success`, `warning`, `error`, `info` - Status colors
-
-**Example usage:**
-
-```tsx
-<div className="bg-surface-main border border-surface-border">
-  <h1 className="text-text-primary">Title</h1>
-  <p className="text-text-secondary">Description</p>
-  <button className="bg-primary-500 text-white">Click me</button>
-</div>
+./tools/smoke-test.sh http://localhost:8000
 ```
 
 ## Configuration
 
-### Environment Variables
+Everything is in `api/config.php`: database credentials, your domain, the Rust
+server address, Steam API key, Discord and social links, and feature flags.
 
-See `.env.example` for all available environment variables:
+Rather than editing that file directly, create **`api/config.local.php`** and
+define only the values you want to change. It is loaded first and wins over the
+defaults, and it is gitignored - so your credentials stay out of the repository
+and survive a `git pull`.
 
-- `VITE_SERVER_ADDRESS` - Game server connection address
-- `VITE_API_URL` - Backend API URL (when implemented)
-- `VITE_DISCORD_INVITE` - Discord server invite link
-- Social media URLs
-- Feature flags
+```php
+<?php
+define('DB_NAME', 'yourusername_artofrust');
+define('DB_USER', 'yourusername_aoruser');
+define('DB_PASS', 'your_database_password');
+define('SITE_URL', 'https://artofrust.art');
+define('STEAM_API_KEY', 'your_steam_api_key');
+define('JWT_SECRET', 'a_random_64_character_string');
+define('ADMIN_STEAM_IDS', ['76561198000000000']);
+```
 
-### Tailwind Configuration
+Generate a JWT secret with:
 
-Custom color schemes and theme settings are in `tailwind.config.js`:
-- `rust` - Orange/rust gaming theme colors
-- `dark` - Dark mode color palette
+```bash
+php -r "echo bin2hex(random_bytes(32));"
+```
 
-## Browser Support
+## Becoming an admin
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+Add your Steam ID (from [steamid.io](https://steamid.io/)) to
+`ADMIN_STEAM_IDS`, then sign in with Steam. The account is created with admin
+rights on first sign-in. After that, admins can promote others from
+**Admin → User Management**.
 
-## Contributing
+## Editing content
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- **News** - written in the admin panel, stored in MySQL.
+- **Wipes** - scheduled in the admin panel. With none scheduled, the countdown
+  falls back to `NEXT_WIPE_DATE` in the config.
+- **Commands, rules, gallery** - PHP arrays in `app/content.php`. Edit the file
+  and save; the change is live.
+- **Player statistics** - posted to `/api/admin/players/stats` by a server-side
+  plugin, or entered by an admin.
 
-## Development Guidelines
+## JSON API
 
-- Follow TypeScript best practices
-- Use functional components with hooks
-- Maintain responsive design for all screen sizes
-- Keep components small and focused
-- Write meaningful commit messages
-- Test across different browsers
+Public endpoints need no authentication:
 
-## Known Issues
+| Endpoint | Description |
+| --- | --- |
+| `GET /api/health` | Liveness check |
+| `GET /api/server/status` | Live player count, map, queue |
+| `GET /api/server/history?hours=24` | Historical player counts |
+| `GET /api/wipes/schedule` | Next, upcoming and past wipes |
+| `GET /api/leaderboards?category=kills` | Rankings: `kills`, `kd`, `playtime`, `headshots` |
+| `GET /api/players/{steamId}` | One player's statistics |
+| `GET /api/news` | Published news posts |
 
-- Gallery images are placeholder content
-- Player stats require manual entry or integration with game plugins
+Write endpoints need an admin bearer token, obtained by completing Steam
+OpenID against `/api/auth/steam/callback`:
+
+```
+Authorization: Bearer <token>
+```
+
+| Endpoint | Description |
+| --- | --- |
+| `POST /api/admin/players/stats` | Create or update a player's statistics |
+| `POST /api/news`, `PUT/DELETE /api/news/{id}` | Manage news |
+| `POST /api/wipes`, `POST /api/wipes/{id}/complete` | Manage wipes |
+| `GET /api/admin/dashboard`, `GET /api/admin/users` | Admin data |
+| `PUT /api/admin/users/{steamId}` | Grant or revoke admin/VIP |
+
+## Themes
+
+Five themes ship with the site: Rust, Dark, Light, Forest and Ocean. The choice
+is stored in a cookie and applied when the page is rendered, so there is no
+flash of the wrong palette on load. Themes are defined in `app/themes.php`;
+adding one is a matter of adding an entry to that array.
 
 ## Deployment
 
-### Recommended: cPanel Hosting
+See [CPANEL_SETUP.md](CPANEL_SETUP.md). The short version: put these files in
+`public_html`, create `api/config.local.php`, import `api/schema.sql`.
 
-This project is designed to run on standard cPanel hosting - **no Node.js server required!**
+## Regenerating the icons
 
-1. Build the frontend: `npm run build`
-2. Upload `dist/*` and `api/` to your `public_html` folder
-3. Set up MySQL database and import `api/schema.sql`
-4. Configure `api/config.php` with your settings
-
-**See [CPANEL_SETUP.md](./CPANEL_SETUP.md) for detailed instructions.**
-
-### Quick Deploy Script
+`app/icons.php` is generated from the lucide icon set and is committed, so
+nothing needs to be installed to run the site. To add an icon, add its name to
+the list in `tools/gen-icons.mjs` and run it once with Node and lucide-react
+available:
 
 ```bash
-# Build and package for deployment
-./deploy.sh
+npm install lucide-react@0.294.0 && node tools/gen-icons.mjs
 ```
 
-This creates a zip file ready for upload to cPanel.
-
-### Alternative Platforms
-
-- **Vercel** - Works with serverless functions for API
-- **Netlify** - Simple hosting with CI/CD
-- **CloudFlare Pages** - Fast global CDN
-
-### Build Command
-```bash
-npm run build
-```
-
-### Output Directory
-```
-dist/
-```
-
-## License
-
-Copyright © 2025 Art Of Rust - All Rights Reserved.
+## Licence
 
 Rust and associated Rust images are copyright of Facepunch Studios LTD.
-
-## Contact
-
-- **Email:** ArtofRustMedia@gmail.com
-- **Discord:** https://discord.gg/artofrust
-- **Twitter:** https://x.com/ArtofRust
-- **YouTube:** https://youtube.com/@ArtofRust
-- **Instagram:** https://www.instagram.com/ArtofRust
-
-## Support
-
-For support, join our Discord server or email ArtofRustMedia@gmail.com.
-
-## Acknowledgments
-
-- Facepunch Studios for Rust
-- React team for the amazing framework
-- Tailwind CSS for the utility-first CSS framework
-- The Art of Rust community
+Icons are from [lucide](https://lucide.dev) (ISC).

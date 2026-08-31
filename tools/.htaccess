@@ -1,0 +1,2 @@
+# Development tooling is never served directly.
+Require all denied

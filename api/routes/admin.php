@@ -1,8 +1,8 @@
 <?php
 /**
- * Admin Routes
+ * Admin routes.
  *
- * Handles admin dashboard and management
+ * Thin JSON wrappers over the shared data layer in app/Data.php.
  */
 
 if (!defined('AOR_API')) {
@@ -11,152 +11,60 @@ if (!defined('AOR_API')) {
 }
 
 /**
- * Get dashboard statistics
+ * GET /api/admin/dashboard (admin)
  */
 function getDashboardStats(): void {
     JWT::requireAdmin();
 
-    // Get counts
-    $totalPlayers = Database::queryOne('SELECT COUNT(*) as count FROM players')['count'];
-    $totalNews = Database::queryOne('SELECT COUNT(*) as count FROM news')['count'];
-    $totalWipes = Database::queryOne('SELECT COUNT(*) as count FROM wipes')['count'];
-    $totalUsers = Database::queryOne('SELECT COUNT(*) as count FROM users')['count'];
-
-    // Get recent players
-    $recentPlayers = Database::query(
-        'SELECT name, kills, deaths, playtime, last_seen
-         FROM players
-         ORDER BY last_seen DESC
-         LIMIT 10'
-    );
-
-    // Get recent server stats
-    $recentStats = Database::query(
-        'SELECT timestamp, players, queue
-         FROM server_stats
-         ORDER BY timestamp DESC
-         LIMIT 24'
-    );
-
-    Response::json([
-        'stats' => [
-            'totalPlayers' => (int) $totalPlayers,
-            'totalNews' => (int) $totalNews,
-            'totalWipes' => (int) $totalWipes,
-            'totalUsers' => (int) $totalUsers
-        ],
-        'recentPlayers' => array_map(function($p) {
-            return [
-                'name' => $p['name'],
-                'kills' => (int) $p['kills'],
-                'deaths' => (int) $p['deaths'],
-                'playtime' => (int) $p['playtime'],
-                'last_seen' => $p['last_seen']
-            ];
-        }, $recentPlayers),
-        'recentStats' => $recentStats
-    ]);
+    Response::json(data_dashboard_stats());
 }
 
 /**
- * Get all users
+ * GET /api/admin/users (admin)
  */
 function getUsers(): void {
     JWT::requireAdmin();
 
-    $users = Database::query(
-        'SELECT steam_id, display_name, avatar_url, is_admin, is_vip, created_at, last_login
-         FROM users
-         ORDER BY last_login DESC'
-    );
-
-    $formattedUsers = array_map(function($user) {
-        return [
-            'steam_id' => $user['steam_id'],
-            'display_name' => $user['display_name'],
-            'avatar_url' => $user['avatar_url'],
-            'is_admin' => (bool) $user['is_admin'],
-            'is_vip' => (bool) $user['is_vip'],
-            'created_at' => $user['created_at'],
-            'last_login' => $user['last_login']
-        ];
-    }, $users);
-
-    Response::json($formattedUsers);
+    Response::json(data_users());
 }
 
 /**
- * Update user privileges
+ * PUT /api/admin/users/{steamId} (admin)
  */
 function updateUserPrivileges(string $steamId, array $input): void {
-    JWT::requireAdmin();
+    $current = JWT::requireAdmin();
 
-    // Check if user exists
-    $user = Database::queryOne('SELECT * FROM users WHERE steam_id = ?', [$steamId]);
+    if (isset($input['isAdmin']) && $steamId === ($current['steamId'] ?? '')) {
+        Response::error('You cannot change your own admin status', 400);
+    }
 
-    if (!$user) {
+    try {
+        $updated = data_update_user_privileges($steamId, $input);
+    } catch (InvalidArgumentException $e) {
+        Response::error($e->getMessage(), 400);
+        return;
+    }
+
+    if (!$updated) {
         Response::notFound('User not found');
     }
-
-    // Build update
-    $updates = [];
-    $params = [];
-
-    if (isset($input['isAdmin'])) {
-        $updates[] = 'is_admin = ?';
-        $params[] = $input['isAdmin'] ? 1 : 0;
-    }
-
-    if (isset($input['isVip'])) {
-        $updates[] = 'is_vip = ?';
-        $params[] = $input['isVip'] ? 1 : 0;
-    }
-
-    if (empty($updates)) {
-        Response::error('No fields to update', 400);
-    }
-
-    $params[] = $steamId;
-
-    Database::execute(
-        'UPDATE users SET ' . implode(', ', $updates) . ' WHERE steam_id = ?',
-        $params
-    );
 
     Response::success(null, 'User privileges updated');
 }
 
 /**
- * Update player stats (manual entry)
+ * POST /api/admin/players/stats (admin)
+ *
+ * The endpoint a server-side plugin posts match statistics to.
  */
 function updatePlayerStats(array $input): void {
     JWT::requireAdmin();
 
-    // Validate input
-    if (empty($input['steamId'])) {
-        Response::error('Steam ID is required', 400);
-    }
-
-    $steamId = $input['steamId'];
-    $name = $input['name'] ?? 'Unknown';
-    $kills = isset($input['kills']) ? (int) $input['kills'] : 0;
-    $deaths = isset($input['deaths']) ? (int) $input['deaths'] : 0;
-    $headshots = isset($input['headshots']) ? (int) $input['headshots'] : 0;
-    $playtime = isset($input['playtime']) ? (int) $input['playtime'] : 0;
-
-    // Check if player exists
-    $existing = Database::queryOne('SELECT * FROM players WHERE steam_id = ?', [$steamId]);
-
-    if ($existing) {
-        Database::execute(
-            'UPDATE players SET name = ?, kills = ?, deaths = ?, headshots = ?, playtime = ?, last_seen = NOW() WHERE steam_id = ?',
-            [$name, $kills, $deaths, $headshots, $playtime, $steamId]
-        );
-    } else {
-        Database::insert(
-            'INSERT INTO players (steam_id, name, kills, deaths, headshots, playtime) VALUES (?, ?, ?, ?, ?, ?)',
-            [$steamId, $name, $kills, $deaths, $headshots, $playtime]
-        );
+    try {
+        data_update_player_stats($input);
+    } catch (InvalidArgumentException $e) {
+        Response::error($e->getMessage(), 400);
+        return;
     }
 
     Response::success(null, 'Player stats updated');

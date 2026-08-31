@@ -1,283 +1,219 @@
 # Art of Rust - cPanel Deployment Guide
 
-This guide explains how to deploy the Art of Rust website to a cPanel hosting environment.
+How to deploy the Art of Rust website to a cPanel hosting account.
 
 ## Overview
 
-The website consists of:
-- **Frontend**: React SPA (built static files)
-- **Backend**: PHP API (runs natively on cPanel)
+The whole site is PHP, so it runs directly on standard cPanel hosting:
+
+- **Pages**: server-rendered PHP
+- **API**: PHP under `/api`
 - **Database**: MySQL
 
-Everything runs on standard cPanel hosting - no Node.js required!
+**Nothing needs to be compiled.** There is no `npm install`, no build step and
+no Node.js requirement anywhere - on the server or on your machine. You can
+clone this repository straight into `public_html` and it works.
 
 ## Prerequisites
 
 - cPanel hosting account
-- PHP 7.4+ (PHP 8.0+ recommended)
+- PHP 7.4 or newer (8.0+ recommended)
 - MySQL 5.7+ or MariaDB 10.2+
-- FTP access or cPanel File Manager
-- Node.js 18+ on your LOCAL machine (for building only)
+- The `pdo_mysql` PHP extension (enabled by default on virtually all hosts)
+- SSH, FTP or cPanel File Manager access
 
-## IMPORTANT: Build Locally, Upload Files
+## Step 1: Get the files onto the server
 
-> **DO NOT** clone this repository directly into `public_html`!
->
-> The repo contains source files that need to be compiled. You must:
-> 1. Build on your local machine
-> 2. Upload only the compiled files to your server
+### Option A - Clone with git (easiest to update)
 
-## Step 1: Build the Frontend (On Your Local Machine)
+If your host offers SSH or cPanel's Git Version Control:
 
 ```bash
-# Clone the repo locally (NOT on the server)
-git clone <repository-url>
-cd AoR-Website-Project
-
-# Install dependencies
-npm install
-
-# Build for production
-npm run build
+cd ~/public_html
+git clone <repository-url> .
 ```
 
-This creates a `dist` folder with the compiled frontend.
+Updating later is then just `git pull`.
 
-### Quick Package Option
+### Option B - Upload a zip
 
-Or use the deploy script to create a ready-to-upload zip:
+On your own machine:
 
 ```bash
 ./deploy.sh
 ```
 
-This creates `artofrust-deploy-YYYYMMDD-HHMMSS.zip` containing everything you need.
+That produces `artofrust-deploy-YYYYMMDD-HHMMSS.zip`. Upload it to
+`public_html` via cPanel File Manager and extract it there.
 
-## Step 2: Create MySQL Database
-
-1. Log into cPanel
-2. Go to **MySQL Databases**
-3. Create a new database (e.g., `yourusername_artofrust`)
-4. Create a new user (e.g., `yourusername_aoruser`)
-5. Add the user to the database with **ALL PRIVILEGES**
-6. Note down:
-   - Database name
-   - Database user
-   - Database password
-
-## Step 3: Import Database Schema
-
-1. Go to **phpMyAdmin** in cPanel
-2. Select your new database
-3. Click **Import**
-4. Upload `api/schema.sql`
-5. Click **Go** to import
-
-## Step 4: Upload Files
-
-Upload the following to your `public_html` folder:
+Either way, `public_html` should end up looking like this:
 
 ```
 public_html/
-├── api/                    # Upload entire api folder
-│   ├── config.php
-│   ├── index.php
-│   ├── schema.sql
-│   ├── .htaccess
-│   ├── includes/
-│   └── routes/
-├── assets/                 # From dist folder
-├── index.html              # From dist folder
-├── .htaccess               # From public folder (important!)
-└── (other files from dist)
+├── index.php          # Front controller
+├── .htaccess          # Routing and security headers
+├── app/               # Application source (not web-accessible)
+├── api/               # JSON API
+├── assets/            # CSS, JavaScript, images
+└── README.md
 ```
 
-### Upload Methods:
+## Step 2: Create the database
 
-**Option A: FTP**
-1. Connect via FTP (FileZilla, etc.)
-2. Upload `dist/*` contents to `public_html/`
-3. Upload `api/` folder to `public_html/api/`
-4. Upload `public/.htaccess` to `public_html/.htaccess`
+1. In cPanel, open **MySQL Databases**
+2. Create a database, e.g. `yourusername_artofrust`
+3. Create a user, e.g. `yourusername_aoruser`, with a strong password
+4. Add the user to the database with **ALL PRIVILEGES**
+5. Note the database name, user and password - you need them in step 4
 
-**Option B: cPanel File Manager**
-1. Zip the files locally
-2. Upload via File Manager
-3. Extract in `public_html`
+## Step 3: Import the schema
 
-## Step 5: Configure the API
+1. Open **phpMyAdmin** in cPanel
+2. Select your new database
+3. Click **Import**, choose `api/schema.sql`, then **Go**
 
-Edit `public_html/api/config.php`:
+That creates the `users`, `players`, `wipes`, `news` and `server_stats` tables,
+plus two sample wipe entries you can delete from the admin panel later.
+
+## Step 4: Configure the site
+
+Create **`public_html/api/config.local.php`**. This file overrides the defaults
+in `api/config.php`, is ignored by git, and survives a `git pull` - so your
+credentials never end up in the repository:
 
 ```php
-// Database Configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'yourusername_artofrust');  // Your database name
-define('DB_USER', 'yourusername_aoruser');    // Your database user
-define('DB_PASS', 'your_secure_password');    // Your database password
+<?php
+// Database
+define('DB_NAME', 'yourusername_artofrust');
+define('DB_USER', 'yourusername_aoruser');
+define('DB_PASS', 'your_database_password');
 
-// Site Configuration
-define('SITE_URL', 'https://artofrust.art');  // Your domain (no trailing slash)
+// Your domain, no trailing slash
+define('SITE_URL', 'https://artofrust.art');
 
-// Rust Server Configuration
-define('RUST_SERVER_IP', '188.64.33.62');     // Your Rust server IP
-define('RUST_SERVER_PORT', 28017);             // Your Rust server port
+// Rust server
+define('RUST_SERVER_IP', '188.64.33.62');
+define('RUST_SERVER_PORT', 28017);
 
-// Steam API Key (get from https://steamcommunity.com/dev/apikey)
+// Steam API key from https://steamcommunity.com/dev/apikey
 define('STEAM_API_KEY', 'your_steam_api_key_here');
 
-// JWT Secret (generate a random 64-character string)
-// Run: php -r "echo bin2hex(random_bytes(32));"
+// Random 64-character string - generate with:
+//   php -r "echo bin2hex(random_bytes(32));"
 define('JWT_SECRET', 'your_random_64_char_string_here');
 
-// Admin Steam IDs (your Steam ID for auto-admin)
+// Your Steam ID, so your account becomes an admin on first sign-in
 define('ADMIN_STEAM_IDS', [
-    '76561198000000000', // Replace with your Steam ID
+    '76561198000000000',
 ]);
 ```
 
-## Step 6: Set File Permissions
+Look through `api/config.php` for everything else you can override: Discord
+invite, social links, donation URL, contact email, map size, fallback wipe
+dates and the feature flags.
 
-Via cPanel File Manager or FTP:
+## Step 5: Check file permissions
+
+Via File Manager or FTP:
 
 ```
-api/               755
-api/config.php     644
-api/index.php      644
-api/.htaccess      644
-api/includes/      755
-api/routes/        755
-.htaccess          644
-index.html         644
-assets/            755
+Directories (app, api, assets and everything inside)   755
+Files (*.php, *.css, *.js, .htaccess)                  644
 ```
 
-## Step 7: Verify Installation
+`api/config.local.php` should also be `644`. It sits behind a `Require all
+denied` rule and is never served, but PHP still needs to read it.
 
-1. Visit your domain - you should see the React app
-2. Visit `https://yourdomain.com/api/health` - should return JSON:
+## Step 6: Verify
+
+1. Visit your domain - the home page should load with the navigation and the
+   server status card.
+2. Visit `https://yourdomain.com/api/health` - you should get:
    ```json
-   {"status":"ok","timestamp":"2024-01-01T00:00:00+00:00","version":"1.0.0"}
+   {"status":"ok","timestamp":"2026-01-01T00:00:00+00:00","version":"1.0.0"}
    ```
-3. Try logging in with Steam
+3. Click **Login with Steam**. After approving, you should come back signed in,
+   with an **Admin Panel** entry in your user menu if you added your Steam ID
+   in step 4.
+
+## Updating the site
+
+With git:
+
+```bash
+cd ~/public_html && git pull
+```
+
+That is the whole process. Your `api/config.local.php` is untouched, and since
+nothing is compiled, the new code is live immediately.
+
+With a zip: run `./deploy.sh` locally, upload, extract, overwrite.
 
 ## Troubleshooting
 
-### "500 Internal Server Error"
+### 500 Internal Server Error
 
-1. Check cPanel Error Logs (Metrics > Errors)
-2. Verify PHP version (PHP 7.4+)
-3. Check file permissions
-4. Enable error display temporarily in `api/config.php`:
-   ```php
-   ini_set('display_errors', '1');
-   ```
+1. Check cPanel **Metrics → Errors** for the PHP error.
+2. Confirm your PHP version is 7.4 or newer (**Select PHP Version** in cPanel).
+3. Temporarily add `ini_set('display_errors', '1');` to
+   `api/config.local.php` to see the message, then remove it.
 
-### Blank white page
+### "The database is temporarily unavailable"
 
-1. Check browser console (F12) for JavaScript errors
-2. Verify `index.html` exists in `public_html` root (not in a subfolder)
-3. Verify `assets/` folder with `.js` and `.css` files exists
-4. Check that you uploaded from `dist/` folder, not the source repo
+The site renders this instead of crashing when it cannot reach MySQL.
 
-### "Request exceeded the limit of 10 internal redirects"
+1. Recheck the credentials in `api/config.local.php`.
+2. Confirm the user is attached to the database with ALL PRIVILEGES.
+3. Some hosts need `127.0.0.1` rather than `localhost`:
+   `define('DB_HOST', '127.0.0.1');`
 
-This is an infinite redirect loop. Causes:
-1. **Wrong file structure**: You may have cloned the repo into `public_html` instead of uploading built files
-2. **Missing index.html**: The `.htaccess` can't find `index.html` to serve
+### Every page except the home page gives 404
 
-**Fix:**
-1. Delete everything in `public_html`
-2. Upload ONLY: `dist/*` contents, `api/` folder, and `public/.htaccess`
-3. Verify `index.html` is at `public_html/index.html` (not in a subfolder)
+`mod_rewrite` is not active, so `.htaccess` is not routing requests.
 
-### "404 Not Found" on page refresh
+1. Confirm `.htaccess` uploaded - some FTP clients hide dotfiles.
+2. Ask your host to enable `mod_rewrite` and `AllowOverride All`.
 
-The `.htaccess` isn't working. Check:
-1. `.htaccess` is uploaded to `public_html` root
-2. `mod_rewrite` is enabled (contact host)
-3. The `.htaccess` file wasn't renamed (some FTP clients hide dotfiles)
+### Styles are missing
 
-### "Database connection failed"
+Check that `assets/css/app.css` loads (open it directly in a browser). If it
+404s, the `assets` directory did not upload completely.
 
-1. Verify database credentials in `config.php`
-2. Ensure database user has proper permissions
-3. Check if `localhost` should be `127.0.0.1`
+### Steam login fails or loops
 
-### Steam login not working
+1. `SITE_URL` must exactly match the address in the browser, including
+   `https://` and without a trailing slash.
+2. Steam must be able to reach your callback at
+   `https://yourdomain.com/auth/steam/callback`.
+3. Confirm `STEAM_API_KEY` is set - without it, names and avatars fall back to
+   placeholders.
 
-1. Verify `STEAM_API_KEY` is correct
-2. Ensure `SITE_URL` matches your actual domain
-3. Check if your host allows outbound connections
+### Server status always shows offline
 
-### Server status showing offline
+The status card queries the Rust server over UDP with the Steam A2S protocol.
 
-1. Your host may block outbound UDP (required for Steam Query)
-2. Try using a different port
-3. Contact host about firewall rules
+1. Many shared hosts block outbound UDP - ask your host.
+2. Confirm `RUST_SERVER_IP` and `RUST_SERVER_PORT` are the **query** port.
 
-## Getting Your Steam API Key
+### Leaderboards are empty
 
-1. Go to https://steamcommunity.com/dev/apikey
-2. Log in with your Steam account
-3. Enter your domain name
-4. Copy the API key to `config.php`
+Nothing has recorded player statistics yet. Either enter them from the admin
+panel, or have a server-side plugin post to `/api/admin/players/stats` with an
+admin bearer token.
 
-## Getting Your Steam ID
+## Security checklist
 
-1. Go to https://steamid.io/
-2. Enter your Steam profile URL
-3. Copy the "steamID64" value
-4. Add it to `ADMIN_STEAM_IDS` in `config.php`
-
-## Updating the Site
-
-1. Make changes locally
-2. Run `npm run build`
-3. Upload new `dist/*` files to `public_html`
-4. Upload any changed `api/` files
-
-## Security Checklist
-
-- [ ] Changed `JWT_SECRET` to a random string
-- [ ] Set proper database credentials
-- [ ] Added your Steam ID to `ADMIN_STEAM_IDS`
-- [ ] Disabled `display_errors` in production
-- [ ] Enabled HTTPS (SSL certificate)
-- [ ] Verified `.htaccess` files are working
-
-## File Structure After Deployment
-
-```
-public_html/
-├── api/
-│   ├── config.php          # Configuration (edit this!)
-│   ├── index.php           # API router
-│   ├── schema.sql          # Database schema
-│   ├── .htaccess           # API routing rules
-│   ├── includes/
-│   │   ├── Database.php
-│   │   ├── JWT.php
-│   │   ├── Response.php
-│   │   ├── SteamAuth.php
-│   │   └── SteamQuery.php
-│   └── routes/
-│       ├── admin.php
-│       ├── auth.php
-│       ├── leaderboards.php
-│       ├── news.php
-│       ├── server.php
-│       └── wipes.php
-├── assets/
-│   ├── index-[hash].js
-│   └── index-[hash].css
-├── index.html
-└── .htaccess
-```
+- [ ] `JWT_SECRET` set to a random 64-character string
+- [ ] Real database credentials in `api/config.local.php`, not `config.php`
+- [ ] Your Steam ID in `ADMIN_STEAM_IDS`
+- [ ] `display_errors` off (it is off by default)
+- [ ] HTTPS enabled, and `SITE_URL` using `https://`
+- [ ] `https://yourdomain.com/app/Data.php` returns 403, not source code
+- [ ] Once HTTPS works, uncomment the `Strict-Transport-Security` header in
+      `.htaccess`
 
 ## Support
 
-If you encounter issues:
-1. Check the troubleshooting section above
-2. Review cPanel error logs
-3. Ensure PHP and MySQL versions meet requirements
+1. Work through the troubleshooting section above
+2. Check the cPanel error logs
+3. Confirm PHP and MySQL meet the versions listed in the prerequisites

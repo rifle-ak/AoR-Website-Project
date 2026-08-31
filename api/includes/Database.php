@@ -33,10 +33,10 @@ class Database {
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
                 ]);
             } catch (PDOException $e) {
+                // Rethrow rather than emitting a response here: the JSON API and
+                // the HTML site each need to report this failure differently.
                 error_log('Database connection failed: ' . $e->getMessage());
-                http_response_code(500);
-                echo json_encode(['error' => 'Database connection failed']);
-                exit;
+                throw $e;
             }
         }
 
