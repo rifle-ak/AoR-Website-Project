@@ -1,51 +1,29 @@
-# Dependencies
-node_modules/
-/.pnp
-.pnp.js
+# Local configuration - credentials live here, never in git
+api/config.local.php
 
-# Testing
-/coverage
+# Logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 
-# Build outputs
-dist/
-dist-ssr/
-build/
-*.local
+# Deployment packages
+deploy-package/
+artofrust-deploy-*.zip
+*.zip
+*.tgz
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Editor directories and files
+# Editor and OS files
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS files
 Thumbs.db
+*.sw?
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
 
-# Production
-*.tgz
-*.zip
-deploy-package/
-artofrust-deploy-*.zip
+# Left over from the previous React build - nothing here needs Node any more
+node_modules/
+dist/

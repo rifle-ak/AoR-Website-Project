@@ -1,8 +1,11 @@
 <?php
 /**
- * Authentication Routes
+ * API authentication routes.
  *
- * Handles Steam OpenID authentication
+ * The website itself signs users in with a session cookie (see app/Auth.php).
+ * These routes exist for programmatic clients - a server-side plugin pushing
+ * player statistics, for instance - which authenticate with a bearer token
+ * instead.
  */
 
 if (!defined('AOR_API')) {
@@ -11,110 +14,70 @@ if (!defined('AOR_API')) {
 }
 
 /**
- * Handle Steam OpenID callback
+ * GET /api/auth/steam/callback
+ *
+ * Completes Steam OpenID and returns a bearer token as JSON rather than
+ * redirecting, since the caller here is a client, not a browser session.
  */
 function handleSteamCallback(): void {
-    // Validate Steam OpenID response
     $steamId = SteamAuth::validate();
 
     if (!$steamId) {
-        // Redirect to frontend with error
-        header('Location: ' . SITE_URL . '?error=auth_failed');
-        exit;
+        Response::unauthorized('Steam authentication failed');
     }
 
-    // Get user profile from Steam
     $profile = SteamAuth::getUserProfile($steamId);
+    $user = data_upsert_steam_user($profile);
 
-    // Check if user exists in database
-    $user = Database::queryOne(
-        'SELECT * FROM users WHERE steam_id = ?',
-        [$steamId]
-    );
-
-    // Check if this Steam ID should be auto-admin
-    $isAutoAdmin = in_array($steamId, ADMIN_STEAM_IDS);
-
-    if (!$user) {
-        // Create new user
-        Database::insert(
-            'INSERT INTO users (steam_id, display_name, avatar_url, is_admin) VALUES (?, ?, ?, ?)',
-            [
-                $steamId,
-                $profile['displayName'],
-                $profile['avatar'],
-                $isAutoAdmin ? 1 : 0
-            ]
-        );
-
-        $user = Database::queryOne(
-            'SELECT * FROM users WHERE steam_id = ?',
-            [$steamId]
-        );
-    } else {
-        // Update existing user
-        Database::execute(
-            'UPDATE users SET display_name = ?, avatar_url = ?, last_login = NOW() WHERE steam_id = ?',
-            [
-                $profile['displayName'],
-                $profile['avatar'],
-                $steamId
-            ]
-        );
-
-        // Refresh user data
-        $user = Database::queryOne(
-            'SELECT * FROM users WHERE steam_id = ?',
-            [$steamId]
-        );
-    }
-
-    // Generate JWT token
     $token = JWT::create([
         'id' => $user['steam_id'],
         'steamId' => $user['steam_id'],
         'displayName' => $user['display_name'],
-        'isAdmin' => (bool) $user['is_admin']
+        'isAdmin' => (bool) $user['is_admin'],
     ]);
 
-    // Redirect to frontend with token
-    header('Location: ' . SITE_URL . '?token=' . urlencode($token));
-    exit;
+    Response::json([
+        'token' => $token,
+        'expiresIn' => JWT_EXPIRY,
+        'user' => [
+            'steamId' => $user['steam_id'],
+            'displayName' => $user['display_name'],
+            'avatarUrl' => $user['avatar_url'],
+            'isAdmin' => (bool) $user['is_admin'],
+            'isVip' => (bool) $user['is_vip'],
+        ],
+    ]);
 }
 
 /**
- * Get current authenticated user
+ * GET /api/auth/me
  */
 function getCurrentUser(): void {
-    $user = JWT::requireAuth();
+    $token = JWT::requireAuth();
+    $user = data_find_user($token['steamId']);
 
-    // Get fresh user data from database
-    $dbUser = Database::queryOne(
-        'SELECT steam_id, display_name, avatar_url, is_admin, is_vip, created_at, last_login FROM users WHERE steam_id = ?',
-        [$user['steamId']]
-    );
-
-    if (!$dbUser) {
+    if (!$user) {
         Response::notFound('User not found');
     }
 
     Response::json([
-        'id' => $dbUser['steam_id'],
-        'steamId' => $dbUser['steam_id'],
-        'displayName' => $dbUser['display_name'],
-        'avatarUrl' => $dbUser['avatar_url'],
-        'isAdmin' => (bool) $dbUser['is_admin'],
-        'isVip' => (bool) $dbUser['is_vip'],
-        'createdAt' => $dbUser['created_at'],
-        'lastLogin' => $dbUser['last_login']
+        'id' => $user['steam_id'],
+        'steamId' => $user['steam_id'],
+        'displayName' => $user['display_name'],
+        'avatarUrl' => $user['avatar_url'],
+        'isAdmin' => (bool) $user['is_admin'],
+        'isVip' => (bool) $user['is_vip'],
+        'createdAt' => $user['created_at'],
+        'lastLogin' => $user['last_login'],
     ]);
 }
 
 /**
- * Logout (client-side token removal)
+ * POST /api/auth/logout
+ *
+ * Bearer tokens are stateless, so the client simply discards its token. The
+ * endpoint exists so callers have something to call.
  */
 function logout(): void {
-    // JWT tokens are stateless, so logout is handled client-side
-    // This endpoint exists for API consistency
     Response::success(null, 'Logged out successfully');
 }

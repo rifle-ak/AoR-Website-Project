@@ -6,8 +6,11 @@
  * Routes requests to appropriate handlers.
  */
 
-// Define API constant to allow includes
+// Guards allowing the shared includes to load.
 define('AOR_API', true);
+define('AOR_APP', true);
+define('ROOT_PATH', dirname(__DIR__));
+define('APP_PATH', ROOT_PATH . '/app');
 
 // Load configuration
 require_once __DIR__ . '/config.php';
@@ -18,6 +21,10 @@ require_once __DIR__ . '/includes/JWT.php';
 require_once __DIR__ . '/includes/Response.php';
 require_once __DIR__ . '/includes/SteamAuth.php';
 require_once __DIR__ . '/includes/SteamQuery.php';
+
+// The data layer the HTML site renders from. Routes below expose the same
+// functions as JSON so both halves of the site cannot drift apart.
+require_once APP_PATH . '/Data.php';
 
 // Set JSON content type
 header('Content-Type: application/json; charset=utf-8');

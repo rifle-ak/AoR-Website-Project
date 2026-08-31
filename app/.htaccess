@@ -1,0 +1,3 @@
+# Application source is never served directly. The root .htaccess also blocks
+# this path; this file keeps it blocked if that rewrite rule is ever removed.
+Require all denied
