@@ -73,47 +73,110 @@ const RUST_COMMANDS = [
     ],
 ];
 
-/** Server rules. Severity drives the icon and badge: ban | warning | info. */
+/**
+ * Server rules, grouped into sections. Severity drives the icon and badge:
+ * ban | warning | info. A section lists plain `items`, or `groups` of
+ * headed item lists; `note` is an optional closing line.
+ */
 const SERVER_RULES = [
     [
-        'title' => 'No Cheating or Exploiting',
-        'description' => 'Use of hacks, scripts, exploits, or any third-party software that gives unfair advantages is strictly prohibited. This includes ESP, aimbot, speedhacks, and similar tools.',
+        'title' => '18+ Only',
         'severity' => 'ban',
+        'items' => [
+            "This server follows Rust's M rating and platform ToS.",
+            'Lying about your age = permanent ban, no appeals.',
+        ],
     ],
     [
-        'title' => 'No Racism, Hate Speech, or Harassment',
-        'description' => 'Treat all players with respect. Racism, homophobia, sexism, or targeted harassment of any kind will result in immediate removal from the server.',
+        'title' => 'General Conduct',
+        'severity' => 'warning',
+        'items' => [
+            'Be respectful. No harassment, discrimination, hate speech, or toxicity.',
+            'No AI discussion and no politics in public channels.',
+            'Staff decisions are final. Appeals go through tickets only.',
+            'Do not argue moderation actions in public channels.',
+        ],
+    ],
+    [
+        'title' => 'Artistic Content Rules',
+        'severity' => 'warning',
+        'intro' => 'All content must be SFW.',
+        'groups' => [
+            [
+                'heading' => 'Not Allowed',
+                'items' => [
+                    'Sexual or erotic imagery',
+                    'AI-generated or AI-assisted art of any kind',
+                    'Using AI as a base, enhancement, or transformation',
+                    "Posting others' artwork without permission",
+                    'Racist, homophobic, or political imagery',
+                    'Stealing, tracing, or defacing artwork',
+                ],
+            ],
+            [
+                'heading' => 'Showcasing Art',
+                'items' => [
+                    'Post portfolios in #artist-portfolios',
+                    'Credit references',
+                    'Your work must be primarily manual and original',
+                ],
+            ],
+        ],
+        'note' => 'Violations escalate: warning → temp ban → permanent ban.',
+    ],
+    [
+        'title' => 'In-Game Building Rules',
+        'severity' => 'warning',
+        'items' => [
+            'AoR Staff will not copy player builds to be pasted back, for server-wide fairness.',
+            '1 grid max per build.',
+            'No blocking monuments, rivers, islands, or Town/Residential areas.',
+            'No TC spam or territory claiming.',
+            'No large or high-entity builds within 2 grids of Main Town.',
+            'Respect server performance — check /limit.',
+            "No griefing others' builds.",
+        ],
+        'note' => 'Breaking these impacts everyone and may result in immediate action.',
+    ],
+    [
+        'title' => 'Zero Tolerance (Instant Perm Ban)',
         'severity' => 'ban',
+        'items' => [
+            'Racist or homophobic slurs',
+            'Harassment, threats, or abuse toward players or staff',
+            'Stealing or defacing artwork',
+            'Flooding, spamming, or advertising',
+            'Monument or river obstruction',
+            'Impersonating players, staff, or creators',
+            'Anything that intentionally degrades server performance or gameplay',
+        ],
     ],
     [
-        'title' => 'No Stream Sniping',
-        'description' => 'Targeting streamers based on information from their stream is not allowed. Play fair and respect content creators.',
-        'severity' => 'warning',
-    ],
-    [
-        'title' => 'No Excessive Griefing',
-        'description' => 'While raiding is part of Rust, excessive griefing (foundation wiping, despawning loot, etc.) ruins the experience for everyone. Raid for loot, not destruction.',
-        'severity' => 'warning',
-    ],
-    [
-        'title' => 'No Blocking Monuments or Resources',
-        'description' => 'Building on or excessively blocking monuments, caves, or key resource areas is prohibited. Everyone needs access to game content.',
-        'severity' => 'warning',
-    ],
-    [
-        'title' => 'No Offensive Base Designs',
-        'description' => 'Bases with offensive symbols, shapes, or inappropriate designs will be removed. Keep it appropriate.',
-        'severity' => 'warning',
-    ],
-    [
-        'title' => 'English in Global Chat',
-        'description' => 'Keep global chat primarily in English so everyone can understand. Use team chat or Discord for other languages.',
+        'title' => 'Security & Enforcement',
         'severity' => 'info',
+        'items' => [
+            'All reports are investigated (alts, logs, in-game data).',
+            'Activity is logged per Discord, Steam, and Facepunch ToS.',
+            'Appeals must be submitted via Discord tickets.',
+        ],
     ],
     [
-        'title' => 'No Spam or Advertising',
-        'description' => "Don't spam chat with repeated messages or advertise other servers/services. Discord links and trading are fine.",
+        'title' => 'Impersonation Policy',
+        'severity' => 'ban',
+        'intro' => 'Do not impersonate anyone:',
+        'items' => [
+            'Similar names or nicknames',
+            'Copying avatars or bios',
+            'Claiming a false identity or affiliation',
+        ],
+    ],
+    [
+        'title' => 'Donations & Server Changes',
         'severity' => 'info',
+        'items' => [
+            'Server runs on donations (/donate).',
+            'Suggestions are welcome in the appropriate channels.',
+        ],
     ],
 ];
 
