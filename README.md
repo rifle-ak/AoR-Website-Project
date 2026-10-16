@@ -102,9 +102,13 @@ php -r "echo bin2hex(random_bytes(32));"
 ## Becoming an admin
 
 Add your Steam ID (from [steamid.io](https://steamid.io/)) to
-`ADMIN_STEAM_IDS`, then sign in with Steam. The account is created with admin
-rights on first sign-in. After that, admins can promote others from
-**Admin → User Management**.
+`ADMIN_STEAM_IDS`, then sign in with Steam (sign out and back in if you were
+already signed in). Listed accounts are made admins at sign-in, including ones
+that existed before the ID was added. After that, admins can promote others
+from **Admin → User Management**.
+
+If `api/config.local.php` exists, set `ADMIN_STEAM_IDS` there: anything it
+defines wins, so an entry in `api/config.php` is silently ignored.
 
 ## Editing content
 

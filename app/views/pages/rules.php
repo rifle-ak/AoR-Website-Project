@@ -8,8 +8,8 @@ $severityIcon = [
 ];
 
 $severityBadge = [
-    'ban' => ['Instant Ban', 'badge-red'],
-    'warning' => ['Warning/Kick', 'badge-yellow'],
+    'ban' => ['Perm Ban', 'badge-red'],
+    'warning' => ['Escalating', 'badge-yellow'],
     'info' => ['Info', 'badge-blue'],
 ];
 ?>
@@ -56,12 +56,32 @@ $severityBadge = [
                 <div class="card card-hover-accent transition-colors">
                     <div class="flex items-start gap-4">
                         <div class="mt-1"><?= icon($iconName, 'w-5 h-5 ' . $iconClass) ?></div>
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between mb-2 gap-3">
                                 <h3 class="text-lg font-bold text-white"><?= e($index + 1) ?>. <?= e($rule['title']) ?></h3>
                                 <span class="text-xs px-2 py-1 rounded font-medium flex-shrink-0 <?= e($badgeClass) ?>"><?= e($badgeLabel) ?></span>
                             </div>
-                            <p class="text-dark-300"><?= e($rule['description']) ?></p>
+                            <?php if (!empty($rule['intro'])): ?>
+                                <p class="text-dark-200 font-medium mb-2"><?= e($rule['intro']) ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($rule['items'])): ?>
+                                <ul class="list-disc pl-5 space-y-1 text-dark-300">
+                                    <?php foreach ($rule['items'] as $item): ?>
+                                        <li><?= e($item) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                            <?php foreach ($rule['groups'] ?? [] as $group): ?>
+                                <h4 class="text-white font-semibold mt-3 mb-1"><?= e($group['heading']) ?></h4>
+                                <ul class="list-disc pl-5 space-y-1 text-dark-300">
+                                    <?php foreach ($group['items'] as $item): ?>
+                                        <li><?= e($item) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endforeach; ?>
+                            <?php if (!empty($rule['note'])): ?>
+                                <p class="text-dark-400 text-sm italic mt-3"><?= e($rule['note']) ?></p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -73,9 +93,10 @@ $severityBadge = [
         <div class="flex items-start gap-3">
             <?= icon('info', 'w-5 h-5 text-rust-500 mt-1') ?>
             <div>
-                <h3 class="text-white font-bold mb-2">Have Questions?</h3>
+                <h3 class="text-white font-bold mb-2">Questions?</h3>
                 <p class="text-dark-300 mb-3">
-                    If you have questions about the rules or need to report a player, please open a ticket on our Discord server. Our admin team is here to help!
+                    Contact an Admin or Owner, or open a ticket on our Discord server.
+                    Ignoring rules after warnings will result in escalating penalties up to permanent removal.
                 </p>
                 <a href="<?= e(DISCORD_INVITE) ?>" target="_blank" rel="noopener noreferrer" class="btn-primary inline-block text-sm">
                     Open Discord Ticket

@@ -102,7 +102,7 @@ define('STEAM_API_KEY', 'your_steam_api_key_here');
 //   php -r "echo bin2hex(random_bytes(32));"
 define('JWT_SECRET', 'your_random_64_char_string_here');
 
-// Your Steam ID, so your account becomes an admin on first sign-in
+// Your Steam ID, so your account becomes an admin when you sign in
 define('ADMIN_STEAM_IDS', [
     '76561198000000000',
 ]);

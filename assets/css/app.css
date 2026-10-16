@@ -590,6 +590,7 @@ select.input-field {
 .pt-8 { padding-top: 2rem; }
 .pb-3 { padding-bottom: 0.75rem; }
 .pl-10 { padding-left: 2.5rem; }
+.pl-5 { padding-left: 1.25rem; }
 .pr-10 { padding-right: 2.5rem; }
 
 /* Sizing */
@@ -648,6 +649,7 @@ select.input-field {
 .font-semibold { font-weight: 600; }
 .font-bold { font-weight: 700; }
 .font-mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+.list-disc { list-style-type: disc; }
 .italic { font-style: italic; }
 .uppercase { text-transform: uppercase; }
 .tracking-wide { letter-spacing: 0.025em; }

@@ -655,12 +655,20 @@ function data_update_player_stats(array $input): void {
 function data_upsert_steam_user(array $profile): array {
     $steamId = $profile['steamId'];
     $existing = Database::queryOne('SELECT * FROM users WHERE steam_id = ?', [$steamId]);
+    $configAdmin = in_array($steamId, ADMIN_STEAM_IDS, true);
 
     if ($existing) {
         Database::execute(
             'UPDATE users SET display_name = ?, avatar_url = ?, last_login = NOW() WHERE steam_id = ?',
             [$profile['displayName'], $profile['avatar'], $steamId]
         );
+
+        // Accounts that existed before their Steam ID was added to the config
+        // are promoted on their next sign-in. Never demotes: admins granted
+        // from the panel keep their rights.
+        if ($configAdmin && !$existing['is_admin']) {
+            Database::execute('UPDATE users SET is_admin = 1 WHERE steam_id = ?', [$steamId]);
+        }
     } else {
         Database::insert(
             'INSERT INTO users (steam_id, display_name, avatar_url, is_admin) VALUES (?, ?, ?, ?)',
@@ -668,7 +676,7 @@ function data_upsert_steam_user(array $profile): array {
                 $steamId,
                 $profile['displayName'],
                 $profile['avatar'],
-                in_array($steamId, ADMIN_STEAM_IDS, true) ? 1 : 0,
+                $configAdmin ? 1 : 0,
             ]
         );
     }
